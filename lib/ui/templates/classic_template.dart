@@ -24,6 +24,18 @@ class ClassicTemplate extends StatelessWidget {
                   letterSpacing: 1.2,
                 ),
               ),
+              if (data.personalInfo.title != null &&
+                  data.personalInfo.title!.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  data.personalInfo.title!.toUpperCase(),
+                  style: GoogleFonts.merriweather(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+              ],
               const SizedBox(height: 8),
               Text(
                 _getContactString(),

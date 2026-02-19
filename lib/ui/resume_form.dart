@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import '../providers/resume_provider.dart';
 import '../models/resume_data.dart';
 
@@ -23,6 +25,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
   late TextEditingController _instagramController;
   late TextEditingController _facebookController;
   late TextEditingController _websiteController;
+  late TextEditingController _skillsController;
 
   @override
   void initState() {
@@ -45,6 +48,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
       text: data.personalInfo.facebook,
     );
     _websiteController = TextEditingController(text: data.personalInfo.website);
+    _skillsController = TextEditingController(text: data.skills.join(', '));
   }
 
   @override
@@ -60,6 +64,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
     _instagramController.dispose();
     _facebookController.dispose();
     _websiteController.dispose();
+    _skillsController.dispose();
     super.dispose();
   }
 
@@ -82,6 +87,18 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
             website: _websiteController.text,
           ),
         );
+  }
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      final currentInfo = ref.read(resumeProvider).personalInfo;
+      ref
+          .read(resumeProvider.notifier)
+          .updatePersonalInfo(currentInfo.copyWith(profilePicture: image.path));
+    }
   }
 
   @override
@@ -287,14 +304,56 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 GestureDetector(
-                  onTap: () {
-                    // TODO: Implement Image Picker
-                  },
+                  onTap: _pickImage,
                   child: Container(
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[300]!),
+                      image:
+                          data.personalInfo.profilePicture != null &&
+                                  data.personalInfo.profilePicture!.isNotEmpty
+                              ? DecorationImage(
+                                  image: data.personalInfo.profilePicture!
+                                          .startsWith('http')
+                                      ? NetworkImage(
+                                          data.personalInfo.profilePicture!,
+                                        )
+                                      : FileImage(
+                                          File(
+                                            data.personalInfo.profilePicture!,
+                                          ),
+                                        ) as ImageProvider,
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
+                    ),
+                    child:
+                        data.personalInfo.profilePicture == null ||
+                                data.personalInfo.profilePicture!.isEmpty
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.add_a_photo,
+                                    color: Colors.grey[400],
+                                    size: 32,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Add Photo',
+                                    style: TextStyle(
+                                      color: Colors.grey[500],
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : null,
+                  ),
+                ),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: Colors.grey[300]!,
@@ -855,6 +914,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: TextField(
+              controller: _skillsController,
               decoration: InputDecoration(
                 hintText: 'React, TypeScript, Node.js...',
                 border: OutlineInputBorder(
@@ -865,7 +925,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                   vertical: 12,
                 ),
               ),
-              controller: TextEditingController(text: data.skills.join(', ')),
+              maxLines: 3,
               onChanged: (val) {
                 final skills = val
                     .split(',')
