@@ -97,7 +97,35 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
     String message,
   ) async {
     final status = await permission.status;
+
     if (status.isGranted) return true;
+
+    if (status.isPermanentlyDenied) {
+      if (!mounted) return false;
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('$title Required'),
+          content: Text(
+            '$message\n\nPlease enable it in your phone settings to use this feature.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                openAppSettings();
+                Navigator.pop(context);
+              },
+              child: const Text('Open Settings'),
+            ),
+          ],
+        ),
+      );
+      return false;
+    }
 
     if (!mounted) return false;
 
@@ -105,7 +133,22 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(title),
-        content: Text(message),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(message),
+            const SizedBox(height: 16),
+            const Text(
+              'This permission will only be used when you choose to add a photo to your resume.',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
