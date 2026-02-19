@@ -105,4 +105,8 @@ class ResumeNotifier extends StateNotifier<ResumeData> {
     list.removeAt(index);
     state = state.copyWith(languages: list);
   }
+
+  void updateLanguageList(List<Language> list) {
+    state = state.copyWith(languages: list);
+  }
 }

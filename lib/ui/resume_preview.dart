@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/resume_provider.dart';
 import '../models/resume_data.dart';
 import 'templates/modern_template.dart';
+import 'templates/classic_template.dart';
 
 class ResumePreview extends ConsumerWidget {
   const ResumePreview({super.key});
@@ -40,9 +41,10 @@ class ResumePreview extends ConsumerWidget {
     switch (data.templateId) {
       case TemplateId.modern:
         return ModernTemplate(data: data);
+      case TemplateId.classic: // Using Classic as default ATS template
+        return ClassicTemplate(data: data);
       default:
-        // For now, fallback to ModernTemplate for all
-        return ModernTemplate(data: data);
+        return ClassicTemplate(data: data);
     }
   }
 }

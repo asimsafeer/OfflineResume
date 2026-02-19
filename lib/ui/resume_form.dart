@@ -106,6 +106,8 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
           _buildCertificatesSection(data),
           const SizedBox(height: 32),
           _buildSkillsSection(data),
+          const SizedBox(height: 32),
+          _buildLanguagesSection(data),
           const SizedBox(height: 48),
         ],
       ),
@@ -129,6 +131,18 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
   }
 
   Widget _buildDesignCard(ResumeData data) {
+    const colors = [
+      '#3B82F6', // Blue
+      '#EF4444', // Red
+      '#10B981', // Green
+      '#F59E0B', // Amber
+      '#8B5CF6', // Purple
+      '#EC4899', // Pink
+      '#6366F1', // Indigo
+      '#1F2937', // Gray
+      '#000000', // Black
+    ];
+
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -189,63 +203,66 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                     ],
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Theme Color',
-                        style: TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Color(
-                                int.parse(
-                                  data.themeColor.replaceFirst('#', '0xFF'),
-                                ),
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Theme Color',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: colors.map((color) {
+                    final isSelected =
+                        data.themeColor.toLowerCase() == color.toLowerCase();
+                    return GestureDetector(
+                      onTap: () {
+                        ref
+                            .read(resumeProvider.notifier)
+                            .updateDesign(
+                              data.templateId,
+                              color,
+                              data.fontFamily,
+                              data.fontSize,
+                            );
+                      },
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: Color(
+                            int.parse(color.replaceFirst('#', '0xFF')),
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: '#3B82F6',
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                ),
-                              ),
-                              onChanged: (val) {
-                                if (val.startsWith('#') &&
-                                    (val.length == 7 || val.length == 4)) {
-                                  ref
-                                      .read(resumeProvider.notifier)
-                                      .updateDesign(
-                                        data.templateId,
-                                        val,
-                                        data.fontFamily,
-                                        data.fontSize,
-                                      );
-                                }
-                              },
-                            ),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected
+                                ? Colors.black
+                                : Colors.transparent,
+                            width: 2,
                           ),
-                        ],
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: isSelected
+                            ? const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 20,
+                              )
+                            : null,
                       ),
-                    ],
-                  ),
+                    );
+                  }).toList(),
                 ),
               ],
             ),
@@ -1130,6 +1147,140 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildLanguagesSection(ResumeData data) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildSectionHeader(Icons.language, 'Languages'),
+            OutlinedButton.icon(
+              onPressed: () {
+                ref
+                    .read(resumeProvider.notifier)
+                    .addLanguage(Language(name: '', proficiency: 'Native'));
+              },
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('Add Language'),
+            ),
+          ],
+        ),
+        if (data.languages.isEmpty)
+          _buildEmptyState('No languages added yet.')
+        else
+          ...data.languages.asMap().entries.map((entry) {
+            return _buildLanguageCard(entry.value, entry.key);
+          }),
+      ],
+    );
+  }
+
+  Widget _buildLanguageCard(Language lang, int index) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey[200]!),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  onPressed: () =>
+                      ref.read(resumeProvider.notifier).removeLanguage(index),
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: _buildTextField(
+                    'Language',
+                    TextEditingController(text: lang.name),
+                    hint: 'English, Spanish...',
+                    onChanged: (val) {
+                      final list = [...ref.read(resumeProvider).languages];
+                      list[index] = Language(
+                        name: val,
+                        proficiency: lang.proficiency,
+                      );
+                      ref
+                          .read(resumeProvider.notifier)
+                          .updateLanguageList(list);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Proficiency',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      DropdownButtonFormField<String>(
+                        value:
+                            [
+                              'Native',
+                              'Fluent',
+                              'Intermediate',
+                              'Beginner',
+                            ].contains(lang.proficiency)
+                            ? lang.proficiency
+                            : 'Native',
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 12,
+                          ),
+                        ),
+                        items: ['Native', 'Fluent', 'Intermediate', 'Beginner']
+                            .map(
+                              (e) => DropdownMenuItem(value: e, child: Text(e)),
+                            )
+                            .toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            final list = [
+                              ...ref.read(resumeProvider).languages,
+                            ];
+                            list[index] = Language(
+                              name: lang.name,
+                              proficiency: val,
+                            );
+                            ref
+                                .read(resumeProvider.notifier)
+                                .updateLanguageList(list);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
