@@ -105,9 +105,9 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.blue.withOpacity(0.2)),
+        side: BorderSide(color: Colors.blue.withValues(alpha: 0.2)),
       ),
-      color: Colors.blue.withOpacity(0.05),
+      color: Colors.blue.withValues(alpha: 0.05),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
