@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/resume_data.dart';
@@ -56,7 +57,10 @@ class ModernTemplate extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   image: DecorationImage(
-                    image: NetworkImage(data.personalInfo.profilePicture!),
+                    image: data.personalInfo.profilePicture!.startsWith('http')
+                        ? NetworkImage(data.personalInfo.profilePicture!)
+                        : FileImage(File(data.personalInfo.profilePicture!))
+                              as ImageProvider,
                     fit: BoxFit.cover,
                   ),
                 ),

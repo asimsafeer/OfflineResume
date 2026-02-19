@@ -314,65 +314,50 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                       border: Border.all(color: Colors.grey[300]!),
                       image:
                           data.personalInfo.profilePicture != null &&
-                                  data.personalInfo.profilePicture!.isNotEmpty
-                              ? DecorationImage(
-                                  image: data.personalInfo.profilePicture!
-                                          .startsWith('http')
-                                      ? NetworkImage(
-                                          data.personalInfo.profilePicture!,
-                                        )
-                                      : FileImage(
+                              data.personalInfo.profilePicture!.isNotEmpty
+                          ? DecorationImage(
+                              image:
+                                  data.personalInfo.profilePicture!.startsWith(
+                                    'http',
+                                  )
+                                  ? NetworkImage(
+                                      data.personalInfo.profilePicture!,
+                                    )
+                                  : FileImage(
                                           File(
                                             data.personalInfo.profilePicture!,
                                           ),
-                                        ) as ImageProvider,
-                                  fit: BoxFit.cover,
-                                )
-                              : null,
+                                        )
+                                        as ImageProvider,
+                              fit: BoxFit.cover,
+                            )
+                          : null,
                     ),
                     child:
                         data.personalInfo.profilePicture == null ||
-                                data.personalInfo.profilePicture!.isEmpty
-                            ? Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.add_a_photo,
-                                    color: Colors.grey[400],
-                                    size: 32,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Add Photo',
-                                    style: TextStyle(
-                                      color: Colors.grey[500],
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : null,
+                            data.personalInfo.profilePicture!.isEmpty
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.add_a_photo,
+                                color: Colors.grey[400],
+                                size: 32,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Add Photo',
+                                style: TextStyle(
+                                  color: Colors.grey[500],
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          )
+                        : null,
                   ),
                 ),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.grey[300]!,
-                        style: BorderStyle.solid,
-                      ),
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.add_a_photo, color: Colors.grey),
-                        SizedBox(height: 4),
-                        Text(
-                          'Photo',
-                          style: TextStyle(fontSize: 10, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
