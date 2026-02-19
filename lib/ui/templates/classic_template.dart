@@ -9,6 +9,11 @@ class ClassicTemplate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Robust color parsing
+    final themeColor = Color(
+      int.parse(data.themeColor.replaceFirst('#', '0xFF'), radix: 16),
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -60,7 +65,7 @@ class ClassicTemplate extends StatelessWidget {
 
         // Summary
         if (data.personalInfo.summary.isNotEmpty) ...[
-          _buildSectionTitle('PROFESSIONAL SUMMARY'),
+          _buildSectionTitle('PROFESSIONAL SUMMARY', themeColor),
           Text(
             data.personalInfo.summary,
             style: GoogleFonts.getFont(
@@ -74,21 +79,23 @@ class ClassicTemplate extends StatelessWidget {
 
         // Experience
         if (data.experience.isNotEmpty) ...[
-          _buildSectionTitle('WORK EXPERIENCE'),
-          ...data.experience.map((exp) => _buildExperienceItem(exp)),
+          _buildSectionTitle('WORK EXPERIENCE', themeColor),
+          ...data.experience.map(
+            (exp) => _buildExperienceItem(exp, themeColor),
+          ),
           const SizedBox(height: 16),
         ],
 
         // Education
         if (data.education.isNotEmpty) ...[
-          _buildSectionTitle('EDUCATION'),
-          ...data.education.map((edu) => _buildEducationItem(edu)),
+          _buildSectionTitle('EDUCATION', themeColor),
+          ...data.education.map((edu) => _buildEducationItem(edu, themeColor)),
           const SizedBox(height: 16),
         ],
 
         // Skills
         if (data.skills.isNotEmpty) ...[
-          _buildSectionTitle('SKILLS'),
+          _buildSectionTitle('SKILLS', themeColor),
           Text(
             data.skills.join(' • '),
             style: GoogleFonts.merriweather(fontSize: 12, height: 1.5),
@@ -98,7 +105,7 @@ class ClassicTemplate extends StatelessWidget {
 
         // Languages
         if (data.languages.isNotEmpty) ...[
-          _buildSectionTitle('LANGUAGES'),
+          _buildSectionTitle('LANGUAGES', themeColor),
           Text(
             data.languages
                 .map((l) => '${l.name} (${l.proficiency})')
@@ -110,7 +117,7 @@ class ClassicTemplate extends StatelessWidget {
 
         // Certificates
         if (data.certificates.isNotEmpty) ...[
-          _buildSectionTitle('CERTIFICATIONS'),
+          _buildSectionTitle('CERTIFICATIONS', themeColor),
           ...data.certificates.map((cert) => _buildCertificateItem(cert)),
         ],
       ],
@@ -144,7 +151,7 @@ class ClassicTemplate extends StatelessWidget {
     return list.join(' | ');
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, Color color) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Column(
@@ -155,15 +162,16 @@ class ClassicTemplate extends StatelessWidget {
             style: GoogleFonts.merriweather(
               fontSize: 14,
               fontWeight: FontWeight.bold,
+              color: color,
             ),
           ),
-          const Divider(color: Colors.black, thickness: 0.5),
+          Divider(color: color, thickness: 1.5, height: 8),
         ],
       ),
     );
   }
 
-  Widget _buildExperienceItem(Experience exp) {
+  Widget _buildExperienceItem(Experience exp, Color themeColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
@@ -177,6 +185,7 @@ class ClassicTemplate extends StatelessWidget {
                 style: GoogleFonts.merriweather(
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
+                  color: themeColor,
                 ),
               ),
               Text(
@@ -205,7 +214,7 @@ class ClassicTemplate extends StatelessWidget {
     );
   }
 
-  Widget _buildEducationItem(Education edu) {
+  Widget _buildEducationItem(Education edu, Color themeColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
@@ -219,6 +228,7 @@ class ClassicTemplate extends StatelessWidget {
                 style: GoogleFonts.merriweather(
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
+                  color: themeColor,
                 ),
               ),
               Text(
@@ -227,7 +237,13 @@ class ClassicTemplate extends StatelessWidget {
               ),
             ],
           ),
-          Text(edu.degree, style: GoogleFonts.merriweather(fontSize: 12)),
+          Text(
+            edu.degree,
+            style: GoogleFonts.merriweather(
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
         ],
       ),
     );

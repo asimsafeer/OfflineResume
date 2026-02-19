@@ -10,8 +10,9 @@ class ModernTemplate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Robust color parsing
     final themeColor = Color(
-      int.parse(data.themeColor.replaceFirst('#', '0xFF')),
+      int.parse(data.themeColor.replaceFirst('#', '0xFF'), radix: 16),
     );
 
     return Column(
