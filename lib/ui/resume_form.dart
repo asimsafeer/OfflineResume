@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../providers/resume_provider.dart';
 import '../models/resume_data.dart';
 import 'resume_form_items.dart';
@@ -90,9 +91,102 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
         );
   }
 
+  Future<bool> _requestPermission(
+    Permission permission,
+    String title,
+    String message,
+  ) async {
+    final status = await permission.status;
+    if (status.isGranted) return true;
+
+    if (!mounted) return false;
+
+    final proceed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Maybe Later'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Grant Permission'),
+          ),
+        ],
+      ),
+    );
+
+    if (proceed != true) return false;
+
+    final result = await permission.request();
+    return result.isGranted;
+  }
+
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Camera'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (source == null) return;
+
+    bool hasPermission = false;
+    if (source == ImageSource.camera) {
+      hasPermission = await _requestPermission(
+        Permission.camera,
+        'Camera Access',
+        'We need access to your camera to take a profile picture for your resume.',
+      );
+    } else {
+      if (Platform.isAndroid) {
+        // Checking for different Android versions is handled by permission_handler
+        // but for photos specifically:
+        hasPermission = await _requestPermission(
+          Permission.photos,
+          'Gallery Access',
+          'We need access to your gallery to select a profile picture for your resume.',
+        );
+      } else {
+        hasPermission = await _requestPermission(
+          Permission.photos,
+          'Photos Access',
+          'We need access to your photos to select a profile picture for your resume.',
+        );
+      }
+    }
+
+    if (!hasPermission) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Permission denied. You can still fill the form.'),
+          ),
+        );
+      }
+      return;
+    }
+
+    final XFile? image = await picker.pickImage(source: source);
 
     if (image != null) {
       final currentInfo = ref.read(resumeProvider).personalInfo;

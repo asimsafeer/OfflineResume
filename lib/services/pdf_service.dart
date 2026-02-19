@@ -1,11 +1,10 @@
-import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
 import '../models/resume_data.dart';
 
 class PdfService {
-  static Future<File> generateResume(ResumeData data) async {
+  static Future<Uint8List> generateResume(ResumeData data) async {
     final pdf = pw.Document();
 
     final themeColor = PdfColor.fromInt(
@@ -62,10 +61,7 @@ class PdfService {
       ),
     );
 
-    final output = await getTemporaryDirectory();
-    final file = File("${output.path}/resume.pdf");
-    await file.writeAsBytes(await pdf.save());
-    return file;
+    return pdf.save();
   }
 
   static pw.Widget _buildHeader(ResumeData data, PdfColor color) {

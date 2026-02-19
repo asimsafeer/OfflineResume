@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:file_picker/file_picker.dart';
 import '../providers/resume_provider.dart';
 import '../services/pdf_service.dart';
 import 'resume_form.dart';
@@ -27,16 +29,29 @@ class MainLayout extends ConsumerWidget {
               onPressed: () async {
                 final data = ref.read(resumeProvider);
                 try {
-                  final file = await PdfService.generateResume(data);
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('PDF Generated: ${file.path}')),
-                    );
+                  final pdfBytes = await PdfService.generateResume(data);
+
+                  final String? outputFile = await FilePicker.platform.saveFile(
+                    dialogTitle: 'Please select where to save your resume',
+                    fileName:
+                        '${data.personalInfo.fullName.replaceAll(' ', '_')}_Resume.pdf',
+                    type: FileType.custom,
+                    allowedExtensions: ['pdf'],
+                  );
+
+                  if (outputFile != null) {
+                    final file = File(outputFile);
+                    await file.writeAsBytes(pdfBytes);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('PDF Saved to: $outputFile')),
+                      );
+                    }
                   }
                 } catch (e) {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error generating PDF: $e')),
+                      SnackBar(content: Text('Error saving PDF: $e')),
                     );
                   }
                 }
