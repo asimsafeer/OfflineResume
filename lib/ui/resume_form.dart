@@ -550,35 +550,6 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Checkbox(
-                            visualDensity: VisualDensity.compact,
-                            value: exp.isCurrent,
-                            onChanged: (val) {
-                              final list = [
-                                ...ref.read(resumeProvider).experience,
-                              ];
-                              list[index] = Experience(
-                                company: exp.company,
-                                position: exp.position,
-                                startDate: exp.startDate,
-                                endDate: val == true ? 'Present' : '',
-                                isCurrent: val ?? false,
-                                description: exp.description,
-                              );
-                              ref
-                                  .read(resumeProvider.notifier)
-                                  .updateExperienceList(list);
-                            },
-                          ),
-                          const Text(
-                            'Currently working',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
-                      ),
                       _buildTextField(
                         'End Date *',
                         TextEditingController(text: exp.endDate),
@@ -792,6 +763,27 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
+                      _buildTextField(
+                        'End Date *',
+                        TextEditingController(text: edu.endDate),
+                        hint: 'Select end date',
+                        enabled: !edu.isCurrent,
+                        onChanged: (val) {
+                          final list = [...ref.read(resumeProvider).education];
+                          list[index] = Education(
+                            institution: edu.institution,
+                            degree: edu.degree,
+                            startDate: edu.startDate,
+                            endDate: val,
+                            isCurrent: edu.isCurrent,
+                            description: edu.description,
+                          );
+                          ref
+                              .read(resumeProvider.notifier)
+                              .updateEducationList(list);
+                        },
+                        icon: Icons.calendar_today,
+                      ),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -820,27 +812,6 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                             style: TextStyle(fontSize: 12),
                           ),
                         ],
-                      ),
-                      _buildTextField(
-                        'End Date *',
-                        TextEditingController(text: edu.endDate),
-                        hint: 'Select end date',
-                        enabled: !edu.isCurrent,
-                        onChanged: (val) {
-                          final list = [...ref.read(resumeProvider).education];
-                          list[index] = Education(
-                            institution: edu.institution,
-                            degree: edu.degree,
-                            startDate: edu.startDate,
-                            endDate: val,
-                            isCurrent: edu.isCurrent,
-                            description: edu.description,
-                          );
-                          ref
-                              .read(resumeProvider.notifier)
-                              .updateEducationList(list);
-                        },
-                        icon: Icons.calendar_today,
                       ),
                     ],
                   ),
