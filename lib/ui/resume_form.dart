@@ -440,16 +440,14 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
           fontFamily: data.experienceFontFamily,
           fontSize: data.experienceFontSize,
           onFontChange: (font) {
-            ref.read(resumeProvider.notifier).updateExperienceDesign(
-              font,
-              data.experienceFontSize,
-            );
+            ref
+                .read(resumeProvider.notifier)
+                .updateExperienceDesign(font, data.experienceFontSize);
           },
           onSizeChange: (size) {
-            ref.read(resumeProvider.notifier).updateExperienceDesign(
-              data.experienceFontFamily,
-              size,
-            );
+            ref
+                .read(resumeProvider.notifier)
+                .updateExperienceDesign(data.experienceFontFamily, size);
           },
         ),
         const SizedBox(height: 16),
@@ -523,12 +521,13 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
             ),
             const SizedBox(height: 16),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: _buildTextField(
                     'Start Date *',
                     TextEditingController(text: exp.startDate),
-                    hint: 'Select start date', // Assuming a date picker, sticking to text for now based on existing patterns
+                    hint: 'Select start date',
                     onChanged: (val) {
                       final list = [...ref.read(resumeProvider).experience];
                       list[index] = Experience(
@@ -551,30 +550,35 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                       Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Checkbox(
-                              value: exp.isCurrent,
-                              visualDensity: VisualDensity.compact,
-                              onChanged: (val) {
-                                final list = [...ref.read(resumeProvider).experience];
-                                list[index] = Experience(
-                                  company: exp.company,
-                                  position: exp.position,
-                                  startDate: exp.startDate,
-                                  endDate: val == true ? 'Present' : '',
-                                  isCurrent: val ?? false,
-                                  description: exp.description,
-                                );
-                                ref
-                                    .read(resumeProvider.notifier)
-                                    .updateExperienceList(list);
-                              },
-                            ),
-                            const Text('Currently working', style: TextStyle(fontSize: 12)),
-                          ],
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Checkbox(
+                            visualDensity: VisualDensity.compact,
+                            value: exp.isCurrent,
+                            onChanged: (val) {
+                              final list = [
+                                ...ref.read(resumeProvider).experience,
+                              ];
+                              list[index] = Experience(
+                                company: exp.company,
+                                position: exp.position,
+                                startDate: exp.startDate,
+                                endDate: val == true ? 'Present' : '',
+                                isCurrent: val ?? false,
+                                description: exp.description,
+                              );
+                              ref
+                                  .read(resumeProvider.notifier)
+                                  .updateExperienceList(list);
+                            },
+                          ),
+                          const Text(
+                            'Currently working',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
                       _buildTextField(
                         'End Date *',
                         TextEditingController(text: exp.endDate),
@@ -601,6 +605,12 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                 ),
               ],
             ),
+            Row(
+              children: [
+                Checkbox(
+                  value: exp.isCurrent,
+                  onChanged: (val) {
+                    final list = [...ref.read(resumeProvider).experience];
                     list[index] = Experience(
                       company: exp.company,
                       position: exp.position,
@@ -617,7 +627,6 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                 const Text('Currently working', style: TextStyle(fontSize: 12)),
               ],
             ),
-
 
             const SizedBox(height: 16),
             _buildTextField(
@@ -669,6 +678,21 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
             ),
           ],
         ),
+        _buildFontControls(
+          fontFamily: data.educationFontFamily,
+          fontSize: data.educationFontSize,
+          onFontChange: (font) {
+            ref
+                .read(resumeProvider.notifier)
+                .updateEducationDesign(font, data.educationFontSize);
+          },
+          onSizeChange: (size) {
+            ref
+                .read(resumeProvider.notifier)
+                .updateEducationDesign(data.educationFontFamily, size);
+          },
+        ),
+        const SizedBox(height: 16),
         if (data.education.isEmpty)
           _buildEmptyState('No education added yet.')
         else
@@ -703,7 +727,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
               ],
             ),
             _buildTextField(
-              'Institution',
+              'Institution *',
               TextEditingController(text: edu.institution),
               hint: 'University/School Name',
               onChanged: (val) {
@@ -721,7 +745,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
             ),
             const SizedBox(height: 16),
             _buildTextField(
-              'Degree',
+              'Degree *',
               TextEditingController(text: edu.degree),
               hint: 'Bachelors/Masters in...',
               onChanged: (val) {
@@ -739,12 +763,13 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
             ),
             const SizedBox(height: 16),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: _buildTextField(
-                    'Start Date',
+                    'Start Date *',
                     TextEditingController(text: edu.startDate),
-                    hint: 'MM/YYYY',
+                    hint: 'Select start date',
                     onChanged: (val) {
                       final list = [...ref.read(resumeProvider).education];
                       list[index] = Education(
@@ -759,29 +784,65 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                           .read(resumeProvider.notifier)
                           .updateEducationList(list);
                     },
+                    icon: Icons.calendar_today,
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _buildTextField(
-                    'End Date',
-                    TextEditingController(text: edu.endDate),
-                    hint: 'MM/YYYY',
-                    enabled: !edu.isCurrent,
-                    onChanged: (val) {
-                      final list = [...ref.read(resumeProvider).education];
-                      list[index] = Education(
-                        institution: edu.institution,
-                        degree: edu.degree,
-                        startDate: edu.startDate,
-                        endDate: val,
-                        isCurrent: edu.isCurrent,
-                        description: edu.description,
-                      );
-                      ref
-                          .read(resumeProvider.notifier)
-                          .updateEducationList(list);
-                    },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Checkbox(
+                            visualDensity: VisualDensity.compact,
+                            value: edu.isCurrent,
+                            onChanged: (val) {
+                              final list = [
+                                ...ref.read(resumeProvider).education,
+                              ];
+                              list[index] = Education(
+                                institution: edu.institution,
+                                degree: edu.degree,
+                                startDate: edu.startDate,
+                                endDate: val == true ? 'Present' : '',
+                                isCurrent: val ?? false,
+                                description: edu.description,
+                              );
+                              ref
+                                  .read(resumeProvider.notifier)
+                                  .updateEducationList(list);
+                            },
+                          ),
+                          const Text(
+                            'Currently studying',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                      _buildTextField(
+                        'End Date *',
+                        TextEditingController(text: edu.endDate),
+                        hint: 'Select end date',
+                        enabled: !edu.isCurrent,
+                        onChanged: (val) {
+                          final list = [...ref.read(resumeProvider).education];
+                          list[index] = Education(
+                            institution: edu.institution,
+                            degree: edu.degree,
+                            startDate: edu.startDate,
+                            endDate: val,
+                            isCurrent: edu.isCurrent,
+                            description: edu.description,
+                          );
+                          ref
+                              .read(resumeProvider.notifier)
+                              .updateEducationList(list);
+                        },
+                        icon: Icons.calendar_today,
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -865,7 +926,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                         name: '',
                         issuer: '',
                         date: '',
-                        description: ''
+                        description: '',
                       ),
                     );
               },
@@ -900,8 +961,9 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
-                  onPressed: () =>
-                      ref.read(resumeProvider.notifier).removeCertificate(index),
+                  onPressed: () => ref
+                      .read(resumeProvider.notifier)
+                      .removeCertificate(index),
                   icon: const Icon(Icons.delete_outline, color: Colors.red),
                   visualDensity: VisualDensity.compact,
                 ),
@@ -985,7 +1047,10 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
   }) {
     return Row(
       children: [
-        const Text('Font: ', style: TextStyle(color: Colors.grey, fontSize: 12)),
+        const Text(
+          'Font: ',
+          style: TextStyle(color: Colors.grey, fontSize: 12),
+        ),
         const SizedBox(width: 8),
         Container(
           height: 32,
@@ -1000,10 +1065,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
             style: const TextStyle(fontSize: 12, color: Colors.black),
             icon: const Icon(Icons.keyboard_arrow_down, size: 16),
             items: ['Inter', 'Roboto', 'Open Sans', 'Lato'].map((font) {
-              return DropdownMenuItem(
-                value: font,
-                child: Text(font),
-              );
+              return DropdownMenuItem(value: font, child: Text(font));
             }).toList(),
             onChanged: (val) {
               if (val != null) onFontChange(val);
@@ -1011,7 +1073,10 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
           ),
         ),
         const SizedBox(width: 24),
-        const Text('Size: ', style: TextStyle(color: Colors.grey, fontSize: 12)),
+        const Text(
+          'Size: ',
+          style: TextStyle(color: Colors.grey, fontSize: 12),
+        ),
         const SizedBox(width: 8),
         Container(
           height: 32,
@@ -1053,15 +1118,21 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-           children: [
-             Text(
-               label.replaceAll('*', ''), // Helper to remove * for label if needed, or keep it
-               style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
-             ),
-             if (label.contains('*'))
-                const Text('*', style: TextStyle(color: Colors.red, fontSize: 13)),
-           ]
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label.replaceAll(
+                '*',
+                '',
+              ), // Helper to remove * for label if needed, or keep it
+              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+            ),
+            if (label.contains('*'))
+              const Text(
+                '*',
+                style: TextStyle(color: Colors.red, fontSize: 13),
+              ),
+          ],
         ),
         const SizedBox(height: 6),
         TextField(
@@ -1077,7 +1148,9 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
           },
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: icon != null ? Icon(icon, size: 18, color: Colors.grey) : null,
+            prefixIcon: icon != null
+                ? Icon(icon, size: 18, color: Colors.grey)
+                : null,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
