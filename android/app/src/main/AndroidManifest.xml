@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="offline_resume_flutter"
+        android:label="Offline Resume"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

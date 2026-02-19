@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 enum TemplateId { classic, modern, minimal, creative, professional }
 

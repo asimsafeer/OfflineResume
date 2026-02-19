@@ -124,7 +124,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                       ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<TemplateId>(
-                        value: data.templateId,
+                        initialValue: data.templateId,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,

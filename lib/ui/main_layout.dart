@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/resume_provider.dart';
 import '../services/pdf_service.dart';
-import '../models/resume_data.dart';
 import 'resume_form.dart';
 import 'resume_preview.dart';
 
