@@ -11,6 +11,8 @@ class MainLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDesktop = MediaQuery.of(context).size.width > 800;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF3F4F6),
       appBar: AppBar(
@@ -45,40 +47,59 @@ class MainLayout extends ConsumerWidget {
           ),
         ],
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth > 900) {
-            // Tablet/Desktop Split View
-            return Row(
+      body: isDesktop
+          ? Row(
               children: [
                 const Expanded(flex: 1, child: ResumeForm()),
                 VerticalDivider(width: 1, color: Colors.grey[300]),
                 const Expanded(flex: 1, child: ResumePreview()),
               ],
-            );
-          } else {
-            // Mobile Stack View (Form with floating/bottom sheet preview)
-            return DefaultTabController(
-              length: 2,
-              child: Column(
-                children: [
-                  const TabBar(
-                    tabs: [
-                      Tab(text: 'Editor'),
-                      Tab(text: 'Preview'),
-                    ],
-                  ),
-                  Expanded(
-                    child: TabBarView(
-                      children: [const ResumeForm(), const ResumePreview()],
+            )
+          : const ResumeForm(),
+      floatingActionButton: isDesktop
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => Container(
+                    height: MediaQuery.of(context).size.height * 0.9,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        Container(
+                          width: 40,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(20),
+                            ),
+                            child: const ResumePreview(),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            );
-          }
-        },
-      ),
+                );
+              },
+              icon: const Icon(Icons.visibility),
+              label: const Text('Live Preview'),
+            ),
     );
   }
 }
