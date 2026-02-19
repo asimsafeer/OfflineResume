@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../providers/resume_provider.dart';
 import '../models/resume_data.dart';
+import 'resume_form_items.dart';
 
 class ResumeForm extends ConsumerStatefulWidget {
   const ResumeForm({super.key});
@@ -362,16 +363,18 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                 Expanded(
                   child: Column(
                     children: [
-                      _buildTextField(
-                        'Full Name',
-                        _nameController,
+                      ResumeTextField(
+                        label: 'Full Name',
+                        controller: _nameController,
                         hint: 'e.g. Ali Khan',
+                        onChanged: (_) => _updatePersonalInfo(),
                       ),
                       const SizedBox(height: 16),
-                      _buildTextField(
-                        'Job Title',
-                        _titleController,
+                      ResumeTextField(
+                        label: 'Job Title',
+                        controller: _titleController,
                         hint: 'e.g. Software Engineer',
+                        onChanged: (_) => _updatePersonalInfo(),
                       ),
                     ],
                   ),
@@ -382,18 +385,20 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
             Row(
               children: [
                 Expanded(
-                  child: _buildTextField(
-                    'Email',
-                    _emailController,
+                  child: ResumeTextField(
+                    label: 'Email',
+                    controller: _emailController,
                     hint: 'yourname@example.com',
+                    onChanged: (_) => _updatePersonalInfo(),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _buildTextField(
-                    'Phone',
-                    _phoneController,
+                  child: ResumeTextField(
+                    label: 'Phone',
+                    controller: _phoneController,
                     hint: '03001234567',
+                    onChanged: (_) => _updatePersonalInfo(),
                   ),
                 ),
               ],
@@ -405,11 +410,12 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
               hint: 'e.g. Lahore, Pakistan',
             ),
             const SizedBox(height: 24),
-            _buildTextField(
-              'Professional Summary',
-              _summaryController,
+            ResumeTextField(
+              label: 'Professional Summary',
+              controller: _summaryController,
               hint: 'Briefly describe your career...',
               maxLines: 4,
+              onChanged: (_) => _updatePersonalInfo(),
             ),
             const SizedBox(height: 16),
             const Divider(),
@@ -422,18 +428,20 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
             Row(
               children: [
                 Expanded(
-                  child: _buildTextField(
-                    'LinkedIn',
-                    _linkedinController,
+                  child: ResumeTextField(
+                    label: 'LinkedIn',
+                    controller: _linkedinController,
                     hint: 'username',
+                    onChanged: (_) => _updatePersonalInfo(),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _buildTextField(
-                    'GitHub',
-                    _githubController,
+                  child: ResumeTextField(
+                    label: 'GitHub',
+                    controller: _githubController,
                     hint: 'username',
+                    onChanged: (_) => _updatePersonalInfo(),
                   ),
                 ),
               ],
@@ -442,27 +450,30 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
             Row(
               children: [
                 Expanded(
-                  child: _buildTextField(
-                    'Instagram',
-                    _instagramController,
+                  child: ResumeTextField(
+                    label: 'Instagram',
+                    controller: _instagramController,
                     hint: 'username',
+                    onChanged: (_) => _updatePersonalInfo(),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _buildTextField(
-                    'Facebook',
-                    _facebookController,
+                  child: ResumeTextField(
+                    label: 'Facebook',
+                    controller: _facebookController,
                     hint: 'username',
+                    onChanged: (_) => _updatePersonalInfo(),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            _buildTextField(
-              'Website',
-              _websiteController,
+            ResumeTextField(
+              label: 'Website',
+              controller: _websiteController,
               hint: 'https://yourwebsite.com',
+              onChanged: (_) => _updatePersonalInfo(),
             ),
             const SizedBox(height: 8),
           ],
