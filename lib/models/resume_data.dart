@@ -68,6 +68,15 @@ class ResumeData {
       educationFontFamily: educationFontFamily ?? this.educationFontFamily,
     );
   }
+
+  bool get hasData {
+    return personalInfo.fullName.isNotEmpty ||
+        education.isNotEmpty ||
+        experience.isNotEmpty ||
+        skills.isNotEmpty ||
+        languages.isNotEmpty ||
+        certificates.isNotEmpty;
+  }
 }
 
 class PersonalInfo {

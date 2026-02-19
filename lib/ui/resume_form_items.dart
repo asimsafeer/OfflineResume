@@ -635,72 +635,63 @@ class _LanguageCardState extends ConsumerState<LanguageCard> {
                 ),
               ],
             ),
-            Row(
+            ResumeTextField(
+              label: 'Language',
+              controller: _nameController,
+              hint: 'English, Spanish...',
+              onChanged: (val) => _updateLanguage(),
+            ),
+            const SizedBox(height: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  flex: 2,
-                  child: ResumeTextField(
-                    label: 'Language',
-                    controller: _nameController,
-                    hint: 'English, Spanish...',
-                    onChanged: (val) => _updateLanguage(),
-                  ),
+                const Text(
+                  'Proficiency',
+                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Proficiency',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      DropdownButtonFormField<String>(
-                        value:
-                            [
-                              'Native',
-                              'Fluent',
-                              'Intermediate',
-                              'Beginner',
-                            ].contains(widget.language.proficiency)
-                            ? widget.language.proficiency
-                            : 'Native',
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 12,
-                          ),
-                        ),
-                        items: ['Native', 'Fluent', 'Intermediate', 'Beginner']
-                            .map(
-                              (e) => DropdownMenuItem(value: e, child: Text(e)),
-                            )
-                            .toList(),
-                        onChanged: (val) {
-                          if (val != null) {
-                            final list = [
-                              ...ref.read(resumeProvider).languages,
-                            ];
-                            if (widget.index < list.length) {
-                              list[widget.index] = Language(
-                                name: _nameController.text,
-                                proficiency: val,
-                              );
-                              ref
-                                  .read(resumeProvider.notifier)
-                                  .updateLanguageList(list);
-                            }
+                const SizedBox(height: 6),
+                InputDecorator(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value:
+                          [
+                            'Native',
+                            'Fluent',
+                            'Intermediate',
+                            'Beginner',
+                          ].contains(widget.language.proficiency)
+                          ? widget.language.proficiency
+                          : 'Native',
+                      isExpanded: true,
+                      items: ['Native', 'Fluent', 'Intermediate', 'Beginner']
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                      onChanged: (val) {
+                        if (val != null) {
+                          final list = [...ref.read(resumeProvider).languages];
+                          if (widget.index < list.length) {
+                            list[widget.index] = Language(
+                              name: _nameController.text,
+                              proficiency: val,
+                            );
+                            ref
+                                .read(resumeProvider.notifier)
+                                .updateLanguageList(list);
                           }
-                        },
-                      ),
-                    ],
+                        }
+                      },
+                    ),
                   ),
                 ),
               ],

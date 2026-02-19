@@ -126,7 +126,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
           _buildSkillsSection(data),
           const SizedBox(height: 32),
           _buildLanguagesSection(data),
-          const SizedBox(height: 48),
+          const SizedBox(height: 120),
         ],
       ),
     );
@@ -404,10 +404,11 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
               ],
             ),
             const SizedBox(height: 16),
-            _buildTextField(
-              'Address',
-              _addressController,
+            ResumeTextField(
+              label: 'Address',
+              controller: _addressController,
               hint: 'e.g. Lahore, Pakistan',
+              onChanged: (_) => _updatePersonalInfo(),
             ),
             const SizedBox(height: 24),
             ResumeTextField(
@@ -527,172 +528,9 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
           _buildEmptyState('No experience added yet.')
         else
           ...data.experience.asMap().entries.map((entry) {
-            return _buildExperienceCard(entry.value, entry.key);
+            return ExperienceCard(experience: entry.value, index: entry.key);
           }),
       ],
-    );
-  }
-
-  Widget _buildExperienceCard(Experience exp, int index) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  onPressed: () =>
-                      ref.read(resumeProvider.notifier).removeExperience(index),
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  visualDensity: VisualDensity.compact,
-                ),
-              ],
-            ),
-            _buildTextField(
-              'Company *',
-              TextEditingController(text: exp.company),
-              hint: 'Company Name',
-              onChanged: (val) {
-                final list = [...ref.read(resumeProvider).experience];
-                list[index] = Experience(
-                  company: val,
-                  position: exp.position,
-                  startDate: exp.startDate,
-                  endDate: exp.endDate,
-                  isCurrent: exp.isCurrent,
-                  description: exp.description,
-                );
-                ref.read(resumeProvider.notifier).updateExperienceList(list);
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              'Position *',
-              TextEditingController(text: exp.position),
-              hint: 'Job Title',
-              onChanged: (val) {
-                final list = [...ref.read(resumeProvider).experience];
-                list[index] = Experience(
-                  company: exp.company,
-                  position: val,
-                  startDate: exp.startDate,
-                  endDate: exp.endDate,
-                  isCurrent: exp.isCurrent,
-                  description: exp.description,
-                );
-                ref.read(resumeProvider.notifier).updateExperienceList(list);
-              },
-            ),
-            const SizedBox(height: 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    'Start Date *',
-                    TextEditingController(text: exp.startDate),
-                    hint: 'Select start date',
-                    onChanged: (val) {
-                      final list = [...ref.read(resumeProvider).experience];
-                      list[index] = Experience(
-                        company: exp.company,
-                        position: exp.position,
-                        startDate: val,
-                        endDate: exp.endDate,
-                        isCurrent: exp.isCurrent,
-                        description: exp.description,
-                      );
-                      ref
-                          .read(resumeProvider.notifier)
-                          .updateExperienceList(list);
-                    },
-                    icon: Icons.calendar_today,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _buildTextField(
-                        'End Date *',
-                        TextEditingController(text: exp.endDate),
-                        hint: 'Select end date',
-                        enabled: !exp.isCurrent,
-                        onChanged: (val) {
-                          final list = [...ref.read(resumeProvider).experience];
-                          list[index] = Experience(
-                            company: exp.company,
-                            position: exp.position,
-                            startDate: exp.startDate,
-                            endDate: val,
-                            isCurrent: exp.isCurrent,
-                            description: exp.description,
-                          );
-                          ref
-                              .read(resumeProvider.notifier)
-                              .updateExperienceList(list);
-                        },
-                        icon: Icons.calendar_today,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Checkbox(
-                  value: exp.isCurrent,
-                  onChanged: (val) {
-                    final list = [...ref.read(resumeProvider).experience];
-                    list[index] = Experience(
-                      company: exp.company,
-                      position: exp.position,
-                      startDate: exp.startDate,
-                      endDate: val == true ? 'Present' : '',
-                      isCurrent: val ?? false,
-                      description: exp.description,
-                    );
-                    ref
-                        .read(resumeProvider.notifier)
-                        .updateExperienceList(list);
-                  },
-                ),
-                const Text('Currently working', style: TextStyle(fontSize: 12)),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-            _buildTextField(
-              'Description',
-              TextEditingController(text: exp.description),
-              hint: 'Responsibilities...',
-              maxLines: 3,
-              onChanged: (val) {
-                final list = [...ref.read(resumeProvider).experience];
-                list[index] = Experience(
-                  company: exp.company,
-                  position: exp.position,
-                  startDate: exp.startDate,
-                  endDate: exp.endDate,
-                  isCurrent: exp.isCurrent,
-                  description: val,
-                );
-                ref.read(resumeProvider.notifier).updateExperienceList(list);
-              },
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -740,159 +578,9 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
           _buildEmptyState('No education added yet.')
         else
           ...data.education.asMap().entries.map((entry) {
-            return _buildEducationCard(entry.value, entry.key);
+            return EducationCard(education: entry.value, index: entry.key);
           }),
       ],
-    );
-  }
-
-  Widget _buildEducationCard(Education edu, int index) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  onPressed: () =>
-                      ref.read(resumeProvider.notifier).removeEducation(index),
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  visualDensity: VisualDensity.compact,
-                ),
-              ],
-            ),
-            _buildTextField(
-              'Institution *',
-              TextEditingController(text: edu.institution),
-              hint: 'University/School Name',
-              onChanged: (val) {
-                final list = [...ref.read(resumeProvider).education];
-                list[index] = Education(
-                  institution: val,
-                  degree: edu.degree,
-                  startDate: edu.startDate,
-                  endDate: edu.endDate,
-                  isCurrent: edu.isCurrent,
-                  description: edu.description,
-                );
-                ref.read(resumeProvider.notifier).updateEducationList(list);
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              'Degree *',
-              TextEditingController(text: edu.degree),
-              hint: 'Bachelors/Masters in...',
-              onChanged: (val) {
-                final list = [...ref.read(resumeProvider).education];
-                list[index] = Education(
-                  institution: edu.institution,
-                  degree: val,
-                  startDate: edu.startDate,
-                  endDate: edu.endDate,
-                  isCurrent: edu.isCurrent,
-                  description: edu.description,
-                );
-                ref.read(resumeProvider.notifier).updateEducationList(list);
-              },
-            ),
-            const SizedBox(height: 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    'Start Date *',
-                    TextEditingController(text: edu.startDate),
-                    hint: 'Select start date',
-                    onChanged: (val) {
-                      final list = [...ref.read(resumeProvider).education];
-                      list[index] = Education(
-                        institution: edu.institution,
-                        degree: edu.degree,
-                        startDate: val,
-                        endDate: edu.endDate,
-                        isCurrent: edu.isCurrent,
-                        description: edu.description,
-                      );
-                      ref
-                          .read(resumeProvider.notifier)
-                          .updateEducationList(list);
-                    },
-                    icon: Icons.calendar_today,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _buildTextField(
-                        'End Date *',
-                        TextEditingController(text: edu.endDate),
-                        hint: 'Select end date',
-                        enabled: !edu.isCurrent,
-                        onChanged: (val) {
-                          final list = [...ref.read(resumeProvider).education];
-                          list[index] = Education(
-                            institution: edu.institution,
-                            degree: edu.degree,
-                            startDate: edu.startDate,
-                            endDate: val,
-                            isCurrent: edu.isCurrent,
-                            description: edu.description,
-                          );
-                          ref
-                              .read(resumeProvider.notifier)
-                              .updateEducationList(list);
-                        },
-                        icon: Icons.calendar_today,
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Checkbox(
-                            visualDensity: VisualDensity.compact,
-                            value: edu.isCurrent,
-                            onChanged: (val) {
-                              final list = [
-                                ...ref.read(resumeProvider).education,
-                              ];
-                              list[index] = Education(
-                                institution: edu.institution,
-                                degree: edu.degree,
-                                startDate: edu.startDate,
-                                endDate: val == true ? 'Present' : '',
-                                isCurrent: val ?? false,
-                                description: edu.description,
-                              );
-                              ref
-                                  .read(resumeProvider.notifier)
-                                  .updateEducationList(list);
-                            },
-                          ),
-                          const Text(
-                            'Currently studying',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -983,103 +671,9 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
           _buildEmptyState('No certificates added yet.')
         else
           ...data.certificates.asMap().entries.map((entry) {
-            return _buildCertificateCard(entry.value, entry.key);
+            return CertificateCard(certificate: entry.value, index: entry.key);
           }),
       ],
-    );
-  }
-
-  Widget _buildCertificateCard(Certificate cert, int index) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  onPressed: () => ref
-                      .read(resumeProvider.notifier)
-                      .removeCertificate(index),
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  visualDensity: VisualDensity.compact,
-                ),
-              ],
-            ),
-            _buildTextField(
-              'Certificate Name *',
-              TextEditingController(text: cert.name),
-              hint: 'e.g. AWS Certified Solutions Architect',
-              onChanged: (val) {
-                final list = [...ref.read(resumeProvider).certificates];
-                list[index] = Certificate(
-                  name: val,
-                  issuer: cert.issuer,
-                  date: cert.date,
-                  description: cert.description,
-                );
-                ref.read(resumeProvider.notifier).updateCertificatesList(list);
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              'Issuer *',
-              TextEditingController(text: cert.issuer),
-              hint: 'e.g. Amazon Web Services',
-              onChanged: (val) {
-                final list = [...ref.read(resumeProvider).certificates];
-                list[index] = Certificate(
-                  name: cert.name,
-                  issuer: val,
-                  date: cert.date,
-                  description: cert.description,
-                );
-                ref.read(resumeProvider.notifier).updateCertificatesList(list);
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              'Date *',
-              TextEditingController(text: cert.date),
-              hint: 'Select date',
-              icon: Icons.calendar_today,
-              onChanged: (val) {
-                final list = [...ref.read(resumeProvider).certificates];
-                list[index] = Certificate(
-                  name: cert.name,
-                  issuer: cert.issuer,
-                  date: val,
-                  description: cert.description,
-                );
-                ref.read(resumeProvider.notifier).updateCertificatesList(list);
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              'Description',
-              TextEditingController(text: cert.description ?? ''),
-              hint: 'Optional brief description',
-              onChanged: (val) {
-                final list = [...ref.read(resumeProvider).certificates];
-                list[index] = Certificate(
-                  name: cert.name,
-                  issuer: cert.issuer,
-                  date: cert.date,
-                  description: val,
-                );
-                ref.read(resumeProvider.notifier).updateCertificatesList(list);
-              },
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -1149,63 +743,6 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
     );
   }
 
-  Widget _buildTextField(
-    String label,
-    TextEditingController controller, {
-    String? hint,
-    int maxLines = 1,
-    bool enabled = true,
-    Function(String)? onChanged,
-    IconData? icon,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label.replaceAll(
-                '*',
-                '',
-              ), // Helper to remove * for label if needed, or keep it
-              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
-            ),
-            if (label.contains('*'))
-              const Text(
-                '*',
-                style: TextStyle(color: Colors.red, fontSize: 13),
-              ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          controller: controller,
-          maxLines: maxLines,
-          enabled: enabled,
-          onChanged: (val) {
-            if (onChanged != null) {
-              onChanged(val);
-            } else {
-              _updatePersonalInfo();
-            }
-          },
-          decoration: InputDecoration(
-            hintText: hint,
-            prefixIcon: icon != null
-                ? Icon(icon, size: 18, color: Colors.grey)
-                : null,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 12,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildLanguagesSection(ResumeData data) {
     return Column(
       children: [
@@ -1228,115 +765,9 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
           _buildEmptyState('No languages added yet.')
         else
           ...data.languages.asMap().entries.map((entry) {
-            return _buildLanguageCard(entry.value, entry.key);
+            return LanguageCard(language: entry.value, index: entry.key);
           }),
       ],
-    );
-  }
-
-  Widget _buildLanguageCard(Language lang, int index) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  onPressed: () =>
-                      ref.read(resumeProvider.notifier).removeLanguage(index),
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  visualDensity: VisualDensity.compact,
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: _buildTextField(
-                    'Language',
-                    TextEditingController(text: lang.name),
-                    hint: 'English, Spanish...',
-                    onChanged: (val) {
-                      final list = [...ref.read(resumeProvider).languages];
-                      list[index] = Language(
-                        name: val,
-                        proficiency: lang.proficiency,
-                      );
-                      ref
-                          .read(resumeProvider.notifier)
-                          .updateLanguageList(list);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Proficiency',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      DropdownButtonFormField<String>(
-                        value:
-                            [
-                              'Native',
-                              'Fluent',
-                              'Intermediate',
-                              'Beginner',
-                            ].contains(lang.proficiency)
-                            ? lang.proficiency
-                            : 'Native',
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 12,
-                          ),
-                        ),
-                        items: ['Native', 'Fluent', 'Intermediate', 'Beginner']
-                            .map(
-                              (e) => DropdownMenuItem(value: e, child: Text(e)),
-                            )
-                            .toList(),
-                        onChanged: (val) {
-                          if (val != null) {
-                            final list = [
-                              ...ref.read(resumeProvider).languages,
-                            ];
-                            list[index] = Language(
-                              name: lang.name,
-                              proficiency: val,
-                            );
-                            ref
-                                .read(resumeProvider.notifier)
-                                .updateLanguageList(list);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
