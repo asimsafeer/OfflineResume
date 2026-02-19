@@ -60,77 +60,48 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // App Logo/Icon
+                      // App Logo/Icon wrapped in a white rounded container
                       Container(
-                        width: 140 * scaleFactor,
-                        height: 140 * scaleFactor,
+                        width: 120 * scaleFactor,
+                        height: 120 * scaleFactor,
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 15,
+                              offset: const Offset(0, 8),
                             ),
                           ],
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            'assets/images/app_icon.png',
-                            fit: BoxFit.contain,
-                          ),
+                        child: Image.asset(
+                          'assets/images/app_icon.png',
+                          fit: BoxFit.contain,
                         ),
                       ),
                       SizedBox(height: 32 * scaleFactor),
                       Text(
                         'Offline CV',
                         style: GoogleFonts.inter(
-                          fontSize: 36 * scaleFactor,
+                          fontSize: 40 * scaleFactor,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
-                          letterSpacing: -0.5,
+                          letterSpacing: 0.5,
                         ),
                       ),
-                      SizedBox(height: 12 * scaleFactor),
+                      SizedBox(height: 8 * scaleFactor),
                       Text(
                         'Professional Resume Builder',
                         style: GoogleFonts.inter(
-                          fontSize: 18 * scaleFactor,
-                          color: Colors.white70,
+                          fontSize: 16 * scaleFactor,
+                          color: Colors.white.withOpacity(0.8),
+                          letterSpacing: 0.5,
                         ),
                       ),
-                      SizedBox(height: 48 * scaleFactor),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (_) => const MainLayout(),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF3B82F6),
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 48 * scaleFactor,
-                            vertical: 16 * scaleFactor,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 8,
-                          shadowColor: Colors.black.withOpacity(0.5),
-                        ),
-                        child: Text(
-                          'Continue',
-                          style: GoogleFonts.inter(
-                            fontSize: 18 * scaleFactor,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 100 * scaleFactor),
+                      SizedBox(height: 80 * scaleFactor),
+                      // Center content ends here
                     ],
                   ),
                 ),
@@ -142,37 +113,82 @@ class _SplashScreenState extends State<SplashScreen>
               bottom: size.height * 0.05,
               child: FadeTransition(
                 opacity: _fadeAnimation,
-                child: Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        'Powered by',
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Continue Button moved to bottom
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (_) => const MainLayout()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white.withOpacity(0.05),
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.white24),
+                        minimumSize: const Size(200, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Continue',
                         style: GoogleFonts.inter(
-                          fontSize: 12 * scaleFactor,
-                          color: Colors.white38,
-                          fontWeight: FontWeight.w400,
-                          letterSpacing: 2.0,
+                          fontSize: 16 * scaleFactor,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      Container(
-                        height: 80 * scaleFactor,
-                        decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 15,
-                              spreadRadius: 2,
+                    ),
+                    SizedBox(height: 32 * scaleFactor),
+                    Text(
+                      'Powered by',
+                      style: GoogleFonts.inter(
+                        fontSize: 11 * scaleFactor,
+                        color: Colors.white.withOpacity(0.5),
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Using the styled logo (non-transparent)
+                        Container(
+                          width: 32 * scaleFactor,
+                          height: 32 * scaleFactor,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 8,
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: Image.asset(
+                              'assets/images/novabyte_logo.jpg',
+                              fit: BoxFit.cover,
                             ),
-                          ],
+                          ),
                         ),
-                        child: Image.asset(
-                          'assets/images/novabyte_logo.jpg',
-                          fit: BoxFit.contain,
+                        const SizedBox(width: 12),
+                        Text(
+                          'NOVA BYTE',
+                          style: GoogleFonts.inter(
+                            fontSize: 18 * scaleFactor,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2.0,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
