@@ -9,7 +9,28 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -17,101 +38,146 @@ class _SplashScreenState extends State<SplashScreen> {
     final scaleFactor = isSmallScreen ? 0.8 : 1.0;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // App Logo/Icon
-                  SizedBox(
-                    width: 140 * scaleFactor,
-                    height: 140 * scaleFactor,
-                    child: Image.asset(
-                      'assets/images/app_icon.png',
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  SizedBox(height: 32 * scaleFactor),
-                  Text(
-                    'Offline CV',
-                    style: GoogleFonts.inter(
-                      fontSize: 36 * scaleFactor,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1F2937),
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  SizedBox(height: 12 * scaleFactor),
-                  Text(
-                    'Professional Resume Builder',
-                    style: GoogleFonts.inter(
-                      fontSize: 18 * scaleFactor,
-                      color: const Color(0xFF6B7280),
-                    ),
-                  ),
-                  SizedBox(height: 48 * scaleFactor),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (_) => const MainLayout()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3B82F6),
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 48 * scaleFactor,
-                        vertical: 16 * scaleFactor,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF1E1B4B), // Deep indigo
+              Color(0xFF0F172A), // Slate 900
+            ],
+          ),
+        ),
+        child: Stack(
+          children: [
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // App Logo/Icon
+                      Container(
+                        width: 140 * scaleFactor,
+                        height: 140 * scaleFactor,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.asset(
+                            'assets/images/app_icon.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      SizedBox(height: 32 * scaleFactor),
+                      Text(
+                        'Offline CV',
+                        style: GoogleFonts.inter(
+                          fontSize: 36 * scaleFactor,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
+                        ),
                       ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      'Continue',
-                      style: GoogleFonts.inter(
-                        fontSize: 18 * scaleFactor,
-                        fontWeight: FontWeight.w600,
+                      SizedBox(height: 12 * scaleFactor),
+                      Text(
+                        'Professional Resume Builder',
+                        style: GoogleFonts.inter(
+                          fontSize: 18 * scaleFactor,
+                          color: Colors.white70,
+                        ),
                       ),
-                    ),
+                      SizedBox(height: 48 * scaleFactor),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (_) => const MainLayout(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF3B82F6),
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 48 * scaleFactor,
+                            vertical: 16 * scaleFactor,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 8,
+                          shadowColor: Colors.black.withOpacity(0.5),
+                        ),
+                        child: Text(
+                          'Continue',
+                          style: GoogleFonts.inter(
+                            fontSize: 18 * scaleFactor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 100 * scaleFactor),
+                    ],
                   ),
-                  // Add some bottom padding for smaller screens to avoid overlap with branding
-                  SizedBox(height: 100 * scaleFactor),
-                ],
+                ),
               ),
             ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: size.height * 0.05,
-            child: Center(
-              child: Column(
-                children: [
-                  Text(
-                    'Powered by',
-                    style: GoogleFonts.inter(
-                      fontSize: 12 * scaleFactor,
-                      color: const Color(0xFF9CA3AF),
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 0.5,
-                    ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: size.height * 0.05,
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        'Powered by',
+                        style: GoogleFonts.inter(
+                          fontSize: 12 * scaleFactor,
+                          color: Colors.white38,
+                          fontWeight: FontWeight.w400,
+                          letterSpacing: 2.0,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        height: 80 * scaleFactor,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 15,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Image.asset(
+                          'assets/images/novabyte_logo.jpg',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  Image.asset(
-                    'assets/images/novabyte_logo_white_v2.png',
-                    height: 80 * scaleFactor, // Increased size
-                    fit: BoxFit.contain,
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

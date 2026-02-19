@@ -112,7 +112,11 @@ class ModernTemplate extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             data.personalInfo.summary,
-            style: GoogleFonts.inter(fontSize: 12, height: 1.5),
+            style: GoogleFonts.getFont(
+              data.personalInfo.summaryFontFamily,
+              fontSize: data.personalInfo.summaryFontSize,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 24),
         ],

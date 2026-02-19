@@ -312,7 +312,6 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[300]!),
                       image:
                           data.personalInfo.profilePicture != null &&
                               data.personalInfo.profilePicture!.isNotEmpty
@@ -417,6 +416,27 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
               hint: 'Briefly describe your career...',
               maxLines: 4,
               onChanged: (_) => _updatePersonalInfo(),
+            ),
+            const SizedBox(height: 8),
+            _buildFontControls(
+              fontFamily: data.personalInfo.summaryFontFamily,
+              fontSize: data.personalInfo.summaryFontSize,
+              onFontChange: (font) {
+                ref
+                    .read(resumeProvider.notifier)
+                    .updateSummaryDesign(
+                      font,
+                      data.personalInfo.summaryFontSize,
+                    );
+              },
+              onSizeChange: (size) {
+                ref
+                    .read(resumeProvider.notifier)
+                    .updateSummaryDesign(
+                      data.personalInfo.summaryFontFamily,
+                      size,
+                    );
+              },
             ),
             const SizedBox(height: 16),
             const Divider(),

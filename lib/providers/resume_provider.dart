@@ -82,6 +82,15 @@ class ResumeNotifier extends StateNotifier<ResumeData> {
     );
   }
 
+  void updateSummaryDesign(String? fontFamily, double? fontSize) {
+    state = state.copyWith(
+      personalInfo: state.personalInfo.copyWith(
+        summaryFontFamily: fontFamily,
+        summaryFontSize: fontSize,
+      ),
+    );
+  }
+
   void updateCertificatesList(List<Certificate> list) {
     state = state.copyWith(certificates: list);
   }
