@@ -72,6 +72,33 @@ class ModernTemplate extends StatelessWidget {
             _buildContactIcon(Icons.email, data.personalInfo.email),
             _buildContactIcon(Icons.phone, data.personalInfo.phone),
             _buildContactIcon(Icons.location_on, data.personalInfo.address),
+            if (data.personalInfo.website != null &&
+                data.personalInfo.website!.isNotEmpty)
+              _buildContactIcon(Icons.language, data.personalInfo.website!),
+            if (data.personalInfo.linkedin != null &&
+                data.personalInfo.linkedin!.isNotEmpty)
+              _buildContactIcon(
+                Icons.link,
+                'in/${data.personalInfo.linkedin!}',
+              ),
+            if (data.personalInfo.github != null &&
+                data.personalInfo.github!.isNotEmpty)
+              _buildContactIcon(
+                Icons.code,
+                'github.com/${data.personalInfo.github!}',
+              ),
+            if (data.personalInfo.instagram != null &&
+                data.personalInfo.instagram!.isNotEmpty)
+              _buildContactIcon(
+                Icons.camera_alt,
+                '@${data.personalInfo.instagram!}',
+              ),
+            if (data.personalInfo.facebook != null &&
+                data.personalInfo.facebook!.isNotEmpty)
+              _buildContactIcon(
+                Icons.people,
+                'fb.com/${data.personalInfo.facebook!}',
+              ),
           ],
         ),
         const Divider(height: 40),

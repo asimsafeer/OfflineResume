@@ -68,6 +68,24 @@ class ResumeNotifier extends StateNotifier<ResumeData> {
     state = state.copyWith(skills: skills);
   }
 
+  void updateExperienceDesign(String? fontFamily, double? fontSize) {
+    state = state.copyWith(
+      experienceFontFamily: fontFamily,
+      experienceFontSize: fontSize,
+    );
+  }
+
+  void updateEducationDesign(String? fontFamily, double? fontSize) {
+    state = state.copyWith(
+      educationFontFamily: fontFamily,
+      educationFontSize: fontSize,
+    );
+  }
+
+  void updateCertificatesList(List<Certificate> list) {
+    state = state.copyWith(certificates: list);
+  }
+
   void addCertificate(Certificate cert) {
     state = state.copyWith(certificates: [...state.certificates, cert]);
   }

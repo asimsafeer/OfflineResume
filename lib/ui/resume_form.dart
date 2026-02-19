@@ -18,6 +18,11 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
   late TextEditingController _summaryController;
+  late TextEditingController _linkedinController;
+  late TextEditingController _githubController;
+  late TextEditingController _instagramController;
+  late TextEditingController _facebookController;
+  late TextEditingController _websiteController;
 
   @override
   void initState() {
@@ -29,6 +34,17 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
     _phoneController = TextEditingController(text: data.personalInfo.phone);
     _addressController = TextEditingController(text: data.personalInfo.address);
     _summaryController = TextEditingController(text: data.personalInfo.summary);
+    _linkedinController = TextEditingController(
+      text: data.personalInfo.linkedin,
+    );
+    _githubController = TextEditingController(text: data.personalInfo.github);
+    _instagramController = TextEditingController(
+      text: data.personalInfo.instagram,
+    );
+    _facebookController = TextEditingController(
+      text: data.personalInfo.facebook,
+    );
+    _websiteController = TextEditingController(text: data.personalInfo.website);
   }
 
   @override
@@ -39,6 +55,11 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
     _phoneController.dispose();
     _addressController.dispose();
     _summaryController.dispose();
+    _linkedinController.dispose();
+    _githubController.dispose();
+    _instagramController.dispose();
+    _facebookController.dispose();
+    _websiteController.dispose();
     super.dispose();
   }
 
@@ -54,6 +75,11 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
             phone: _phoneController.text,
             address: _addressController.text,
             summary: _summaryController.text,
+            linkedin: _linkedinController.text,
+            github: _githubController.text,
+            instagram: _instagramController.text,
+            facebook: _facebookController.text,
+            website: _websiteController.text,
           ),
         );
   }
@@ -76,6 +102,8 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
           _buildExperienceSection(data),
           const SizedBox(height: 32),
           _buildEducationSection(data),
+          const SizedBox(height: 32),
+          _buildCertificatesSection(data),
           const SizedBox(height: 32),
           _buildSkillsSection(data),
           const SizedBox(height: 48),
@@ -135,10 +163,14 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                             horizontal: 12,
                           ),
                         ),
+                        isExpanded: true,
                         items: TemplateId.values.map((id) {
                           return DropdownMenuItem(
                             value: id,
-                            child: Text(id.name.toUpperCase()),
+                            child: Text(
+                              id.name.toUpperCase(),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           );
                         }).toList(),
                         onChanged: (val) {
@@ -318,6 +350,60 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
               hint: 'Briefly describe your career...',
               maxLines: 4,
             ),
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 16),
+            const Text(
+              'Social Links',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextField(
+                    'LinkedIn',
+                    _linkedinController,
+                    hint: 'username',
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildTextField(
+                    'GitHub',
+                    _githubController,
+                    hint: 'username',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextField(
+                    'Instagram',
+                    _instagramController,
+                    hint: 'username',
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildTextField(
+                    'Facebook',
+                    _facebookController,
+                    hint: 'username',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              'Website',
+              _websiteController,
+              hint: 'https://yourwebsite.com',
+            ),
+            const SizedBox(height: 8),
           ],
         ),
       ),
@@ -326,6 +412,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
 
   Widget _buildExperienceSection(ResumeData data) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -349,6 +436,23 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
             ),
           ],
         ),
+        _buildFontControls(
+          fontFamily: data.experienceFontFamily,
+          fontSize: data.experienceFontSize,
+          onFontChange: (font) {
+            ref.read(resumeProvider.notifier).updateExperienceDesign(
+              font,
+              data.experienceFontSize,
+            );
+          },
+          onSizeChange: (size) {
+            ref.read(resumeProvider.notifier).updateExperienceDesign(
+              data.experienceFontFamily,
+              size,
+            );
+          },
+        ),
+        const SizedBox(height: 16),
         if (data.experience.isEmpty)
           _buildEmptyState('No experience added yet.')
         else
@@ -383,7 +487,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
               ],
             ),
             _buildTextField(
-              'Company',
+              'Company *',
               TextEditingController(text: exp.company),
               hint: 'Company Name',
               onChanged: (val) {
@@ -401,7 +505,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
             ),
             const SizedBox(height: 16),
             _buildTextField(
-              'Position',
+              'Position *',
               TextEditingController(text: exp.position),
               hint: 'Job Title',
               onChanged: (val) {
@@ -422,9 +526,9 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
               children: [
                 Expanded(
                   child: _buildTextField(
-                    'Start Date',
+                    'Start Date *',
                     TextEditingController(text: exp.startDate),
-                    hint: 'MM/YYYY',
+                    hint: 'Select start date', // Assuming a date picker, sticking to text for now based on existing patterns
                     onChanged: (val) {
                       final list = [...ref.read(resumeProvider).experience];
                       list[index] = Experience(
@@ -439,39 +543,64 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                           .read(resumeProvider.notifier)
                           .updateExperienceList(list);
                     },
+                    icon: Icons.calendar_today,
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _buildTextField(
-                    'End Date',
-                    TextEditingController(text: exp.endDate),
-                    hint: 'MM/YYYY',
-                    enabled: !exp.isCurrent,
-                    onChanged: (val) {
-                      final list = [...ref.read(resumeProvider).experience];
-                      list[index] = Experience(
-                        company: exp.company,
-                        position: exp.position,
-                        startDate: exp.startDate,
-                        endDate: val,
-                        isCurrent: exp.isCurrent,
-                        description: exp.description,
-                      );
-                      ref
-                          .read(resumeProvider.notifier)
-                          .updateExperienceList(list);
-                    },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                       Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: exp.isCurrent,
+                              visualDensity: VisualDensity.compact,
+                              onChanged: (val) {
+                                final list = [...ref.read(resumeProvider).experience];
+                                list[index] = Experience(
+                                  company: exp.company,
+                                  position: exp.position,
+                                  startDate: exp.startDate,
+                                  endDate: val == true ? 'Present' : '',
+                                  isCurrent: val ?? false,
+                                  description: exp.description,
+                                );
+                                ref
+                                    .read(resumeProvider.notifier)
+                                    .updateExperienceList(list);
+                              },
+                            ),
+                            const Text('Currently working', style: TextStyle(fontSize: 12)),
+                          ],
+                        ),
+                      _buildTextField(
+                        'End Date *',
+                        TextEditingController(text: exp.endDate),
+                        hint: 'Select end date',
+                        enabled: !exp.isCurrent,
+                        onChanged: (val) {
+                          final list = [...ref.read(resumeProvider).experience];
+                          list[index] = Experience(
+                            company: exp.company,
+                            position: exp.position,
+                            startDate: exp.startDate,
+                            endDate: val,
+                            isCurrent: exp.isCurrent,
+                            description: exp.description,
+                          );
+                          ref
+                              .read(resumeProvider.notifier)
+                              .updateExperienceList(list);
+                        },
+                        icon: Icons.calendar_today,
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            Row(
-              children: [
-                Checkbox(
-                  value: exp.isCurrent,
-                  onChanged: (val) {
-                    final list = [...ref.read(resumeProvider).experience];
                     list[index] = Experience(
                       company: exp.company,
                       position: exp.position,
@@ -488,6 +617,8 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                 const Text('Currently working', style: TextStyle(fontSize: 12)),
               ],
             ),
+
+
             const SizedBox(height: 16),
             _buildTextField(
               'Description',
@@ -718,6 +849,197 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
     );
   }
 
+  Widget _buildCertificatesSection(ResumeData data) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildSectionHeader(Icons.card_membership, 'Certificates'),
+            OutlinedButton.icon(
+              onPressed: () {
+                ref
+                    .read(resumeProvider.notifier)
+                    .addCertificate(
+                      Certificate(
+                        name: '',
+                        issuer: '',
+                        date: '',
+                        description: ''
+                      ),
+                    );
+              },
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('Add Certificate'),
+            ),
+          ],
+        ),
+        if (data.certificates.isEmpty)
+          _buildEmptyState('No certificates added yet.')
+        else
+          ...data.certificates.asMap().entries.map((entry) {
+            return _buildCertificateCard(entry.value, entry.key);
+          }),
+      ],
+    );
+  }
+
+  Widget _buildCertificateCard(Certificate cert, int index) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey[200]!),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  onPressed: () =>
+                      ref.read(resumeProvider.notifier).removeCertificate(index),
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
+            ),
+            _buildTextField(
+              'Certificate Name *',
+              TextEditingController(text: cert.name),
+              hint: 'e.g. AWS Certified Solutions Architect',
+              onChanged: (val) {
+                final list = [...ref.read(resumeProvider).certificates];
+                list[index] = Certificate(
+                  name: val,
+                  issuer: cert.issuer,
+                  date: cert.date,
+                  description: cert.description,
+                );
+                ref.read(resumeProvider.notifier).updateCertificatesList(list);
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              'Issuer *',
+              TextEditingController(text: cert.issuer),
+              hint: 'e.g. Amazon Web Services',
+              onChanged: (val) {
+                final list = [...ref.read(resumeProvider).certificates];
+                list[index] = Certificate(
+                  name: cert.name,
+                  issuer: val,
+                  date: cert.date,
+                  description: cert.description,
+                );
+                ref.read(resumeProvider.notifier).updateCertificatesList(list);
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              'Date *',
+              TextEditingController(text: cert.date),
+              hint: 'Select date',
+              icon: Icons.calendar_today,
+              onChanged: (val) {
+                final list = [...ref.read(resumeProvider).certificates];
+                list[index] = Certificate(
+                  name: cert.name,
+                  issuer: cert.issuer,
+                  date: val,
+                  description: cert.description,
+                );
+                ref.read(resumeProvider.notifier).updateCertificatesList(list);
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildTextField(
+              'Description',
+              TextEditingController(text: cert.description ?? ''),
+              hint: 'Optional brief description',
+              onChanged: (val) {
+                final list = [...ref.read(resumeProvider).certificates];
+                list[index] = Certificate(
+                  name: cert.name,
+                  issuer: cert.issuer,
+                  date: cert.date,
+                  description: val,
+                );
+                ref.read(resumeProvider.notifier).updateCertificatesList(list);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFontControls({
+    required String? fontFamily,
+    required double? fontSize,
+    required Function(String) onFontChange,
+    required Function(double) onSizeChange,
+  }) {
+    return Row(
+      children: [
+        const Text('Font: ', style: TextStyle(color: Colors.grey, fontSize: 12)),
+        const SizedBox(width: 8),
+        Container(
+          height: 32,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey[300]!),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: DropdownButton<String>(
+            value: fontFamily ?? 'Inter',
+            underline: const SizedBox(),
+            style: const TextStyle(fontSize: 12, color: Colors.black),
+            icon: const Icon(Icons.keyboard_arrow_down, size: 16),
+            items: ['Inter', 'Roboto', 'Open Sans', 'Lato'].map((font) {
+              return DropdownMenuItem(
+                value: font,
+                child: Text(font),
+              );
+            }).toList(),
+            onChanged: (val) {
+              if (val != null) onFontChange(val);
+            },
+          ),
+        ),
+        const SizedBox(width: 24),
+        const Text('Size: ', style: TextStyle(color: Colors.grey, fontSize: 12)),
+        const SizedBox(width: 8),
+        Container(
+          height: 32,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey[300]!),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: DropdownButton<double>(
+            value: fontSize ?? 12.0,
+            underline: const SizedBox(),
+            style: const TextStyle(fontSize: 12, color: Colors.black),
+            icon: const Icon(Icons.keyboard_arrow_down, size: 16),
+            items: [10.0, 11.0, 12.0, 13.0, 14.0].map((size) {
+              return DropdownMenuItem(
+                value: size,
+                child: Text('${size.toInt()}px'),
+              );
+            }).toList(),
+            onChanged: (val) {
+              if (val != null) onSizeChange(val);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildTextField(
     String label,
     TextEditingController controller, {
@@ -725,13 +1047,21 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
     int maxLines = 1,
     bool enabled = true,
     Function(String)? onChanged,
+    IconData? icon,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+        Row(
+           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+           children: [
+             Text(
+               label.replaceAll('*', ''), // Helper to remove * for label if needed, or keep it
+               style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+             ),
+             if (label.contains('*'))
+                const Text('*', style: TextStyle(color: Colors.red, fontSize: 13)),
+           ]
         ),
         const SizedBox(height: 6),
         TextField(
@@ -747,6 +1077,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
           },
           decoration: InputDecoration(
             hintText: hint,
+            prefixIcon: icon != null ? Icon(icon, size: 18, color: Colors.grey) : null,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,

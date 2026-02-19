@@ -1,4 +1,3 @@
-
 enum TemplateId { classic, modern, minimal, creative, professional }
 
 enum FontSize { small, medium, large }
@@ -17,6 +16,7 @@ class ResumeData {
   final double experienceFontSize;
   final double educationFontSize;
   final String? experienceFontFamily;
+  final String? educationFontFamily;
 
   ResumeData({
     this.templateId = TemplateId.modern,
@@ -32,6 +32,7 @@ class ResumeData {
     this.experienceFontSize = 12.0,
     this.educationFontSize = 12.0,
     this.experienceFontFamily,
+    this.educationFontFamily,
   });
 
   ResumeData copyWith({
@@ -48,6 +49,7 @@ class ResumeData {
     double? experienceFontSize,
     double? educationFontSize,
     String? experienceFontFamily,
+    String? educationFontFamily,
   }) {
     return ResumeData(
       templateId: templateId ?? this.templateId,
@@ -63,6 +65,7 @@ class ResumeData {
       experienceFontSize: experienceFontSize ?? this.experienceFontSize,
       educationFontSize: educationFontSize ?? this.educationFontSize,
       experienceFontFamily: experienceFontFamily ?? this.experienceFontFamily,
+      educationFontFamily: educationFontFamily ?? this.educationFontFamily,
     );
   }
 }
@@ -189,8 +192,5 @@ class Language {
   final String name;
   final String proficiency;
 
-  Language({
-    required this.name,
-    required this.proficiency,
-  });
+  Language({required this.name, required this.proficiency});
 }
