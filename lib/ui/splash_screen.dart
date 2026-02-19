@@ -70,7 +70,7 @@ class _SplashScreenState extends State<SplashScreen>
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha: 0.2),
                               blurRadius: 15,
                               offset: const Offset(0, 8),
                             ),
@@ -96,7 +96,7 @@ class _SplashScreenState extends State<SplashScreen>
                         'Professional Resume Builder',
                         style: GoogleFonts.inter(
                           fontSize: 16 * scaleFactor,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -124,7 +124,7 @@ class _SplashScreenState extends State<SplashScreen>
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white.withOpacity(0.05),
+                        backgroundColor: Colors.white.withValues(alpha: 0.05),
                         foregroundColor: Colors.white,
                         side: const BorderSide(color: Colors.white24),
                         minimumSize: const Size(200, 50),
@@ -146,7 +146,7 @@ class _SplashScreenState extends State<SplashScreen>
                       'Powered by',
                       style: GoogleFonts.inter(
                         fontSize: 11 * scaleFactor,
-                        color: Colors.white.withOpacity(0.5),
+                        color: Colors.white.withValues(alpha: 0.5),
                         fontWeight: FontWeight.w400,
                         letterSpacing: 1.0,
                       ),
@@ -163,7 +163,7 @@ class _SplashScreenState extends State<SplashScreen>
                             borderRadius: BorderRadius.circular(4),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
+                                color: Colors.black.withValues(alpha: 0.2),
                                 blurRadius: 8,
                               ),
                             ],
