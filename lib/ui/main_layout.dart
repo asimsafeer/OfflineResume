@@ -17,7 +17,7 @@ class MainLayout extends ConsumerWidget {
       backgroundColor: const Color(0xFFF3F4F6),
       appBar: AppBar(
         title: Text(
-          'OfflineCV',
+          'Offline CV',
           style: GoogleFonts.inter(fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -56,7 +56,7 @@ class MainLayout extends ConsumerWidget {
               ],
             )
           : const ResumeForm(),
-      floatingActionButton: isDesktop
+      floatingActionButton: isDesktop || !ref.watch(resumeProvider).hasData
           ? null
           : FloatingActionButton.extended(
               onPressed: () {

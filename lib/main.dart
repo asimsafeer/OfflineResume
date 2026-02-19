@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'ui/main_layout.dart';
+import 'ui/splash_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: OfflineResumeApp()));
@@ -13,7 +13,7 @@ class OfflineResumeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'OfflineCV',
+      title: 'Offline CV',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -28,7 +28,7 @@ class OfflineResumeApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: const MainLayout(),
+      home: const SplashScreen(),
     );
   }
 }
