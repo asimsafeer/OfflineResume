@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import '../providers/resume_provider.dart';
 import '../services/pdf_service.dart';
 import 'resume_form.dart';
@@ -31,20 +34,46 @@ class MainLayout extends ConsumerWidget {
                 try {
                   final pdfBytes = await PdfService.generateResume(data);
 
-                  final String? outputFile = await FilePicker.platform.saveFile(
-                    dialogTitle: 'Please select where to save your resume',
-                    fileName:
-                        '${data.personalInfo.fullName.replaceAll(' ', '_')}_Resume.pdf',
-                    type: FileType.custom,
-                    allowedExtensions: ['pdf'],
-                  );
+                  final fileName =
+                      '${data.personalInfo.fullName.replaceAll(' ', '_')}_Resume.pdf';
 
-                  if (outputFile != null) {
-                    final file = File(outputFile);
+                  if (kIsWeb ||
+                      Platform.isWindows ||
+                      Platform.isMacOS ||
+                      Platform.isLinux) {
+                    final String? outputFile = await FilePicker.platform
+                        .saveFile(
+                          dialogTitle:
+                              'Please select where to save your resume',
+                          fileName: fileName,
+                          type: FileType.custom,
+                          allowedExtensions: ['pdf'],
+                        );
+
+                    if (outputFile != null) {
+                      final file = File(outputFile);
+                      await file.writeAsBytes(pdfBytes);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('PDF Saved to: $outputFile')),
+                        );
+                      }
+                    }
+                  } else {
+                    // Mobile platforms (iOS / Android)
+                    // Write to temp directory, then share so the user can natively select "Save to Files"
+                    final tempDir = await getTemporaryDirectory();
+                    final file = await File(
+                      '${tempDir.path}/$fileName',
+                    ).create();
                     await file.writeAsBytes(pdfBytes);
+
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('PDF Saved to: $outputFile')),
+                      final box = context.findRenderObject() as RenderBox?;
+                      await Share.shareXFiles(
+                        [XFile(file.path, mimeType: 'application/pdf')],
+                        sharePositionOrigin:
+                            box!.localToGlobal(Offset.zero) & box.size,
                       );
                     }
                   }
