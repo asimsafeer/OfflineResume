@@ -11,7 +11,7 @@ class ClassicTemplate extends StatelessWidget {
   Widget build(BuildContext context) {
     // Robust color parsing
     final themeColor = Color(
-      int.parse(data.themeColor.replaceFirst('#', '0xFF'), radix: 16),
+      int.parse(data.themeColor.replaceFirst('#', '0xFF')),
     );
 
     return Column(

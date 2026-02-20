@@ -98,7 +98,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
   ) async {
     final status = await permission.status;
 
-    if (status.isGranted) return true;
+    if (status.isGranted || status.isLimited) return true;
 
     if (status.isPermanentlyDenied) {
       if (!mounted) return false;
@@ -165,7 +165,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
     if (proceed != true) return false;
 
     final result = await permission.request();
-    return result.isGranted;
+    return result.isGranted || result.isLimited;
   }
 
   Future<void> _pickImage() async {
