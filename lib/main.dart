@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'providers/resume_provider.dart';
+import 'services/storage_service.dart';
 import 'ui/splash_screen.dart';
 
-void main() {
-  runApp(const ProviderScope(child: OfflineResumeApp()));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Fonts are bundled in assets/fonts so they work without internet.
+  GoogleFonts.config.allowRuntimeFetching = false;
+
+  final savedResume = await StorageService.loadResume();
+
+  runApp(
+    ProviderScope(
+      overrides: [initialResumeProvider.overrideWithValue(savedResume)],
+      child: const OfflineResumeApp(),
+    ),
+  );
 }
 
 class OfflineResumeApp extends StatelessWidget {

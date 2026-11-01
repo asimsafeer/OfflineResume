@@ -1,22 +1,64 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/resume_data.dart';
+import '../services/storage_service.dart';
+
+/// Resume loaded from the device at startup (set in main.dart).
+final initialResumeProvider = Provider<ResumeData?>((ref) => null);
 
 final resumeProvider = StateNotifierProvider<ResumeNotifier, ResumeData>((ref) {
-  return ResumeNotifier();
+  return ResumeNotifier(ref.watch(initialResumeProvider));
 });
 
+ResumeData _emptyResume() => ResumeData(
+  personalInfo: PersonalInfo(fullName: '', email: '', phone: '', address: ''),
+);
+
 class ResumeNotifier extends StateNotifier<ResumeData> {
-  ResumeNotifier()
-    : super(
-        ResumeData(
-          personalInfo: PersonalInfo(
-            fullName: '',
-            email: '',
-            phone: '',
-            address: '',
-          ),
-        ),
-      );
+  ResumeNotifier([ResumeData? initial]) : super(initial ?? _emptyResume());
+
+  Timer? _saveTimer;
+
+  /// Every change is saved to the device shortly after it happens.
+  @override
+  set state(ResumeData value) {
+    super.state = value;
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(milliseconds: 400), () {
+      StorageService.saveResume(value);
+    });
+  }
+
+  @override
+  void dispose() {
+    _saveTimer?.cancel();
+    StorageService.saveResume(state);
+    super.dispose();
+  }
+
+  /// Wipes the resume so the user can start a new one.
+  Future<void> clear() async {
+    _saveTimer?.cancel();
+    final photo = state.personalInfo.profilePicture;
+    super.state = _emptyResume();
+    await StorageService.clearResume();
+    // Delete the app's own copy of the photo too.
+    if (photo != null && photo.isNotEmpty) {
+      try {
+        final dir = await getApplicationDocumentsDirectory();
+        final file = File(photo);
+        if (p.isWithin(dir.path, photo) && await file.exists()) {
+          await file.delete();
+        }
+      } catch (e) {
+        debugPrint('Could not delete profile photo: $e');
+      }
+    }
+  }
 
   void updatePersonalInfo(PersonalInfo info) {
     state = state.copyWith(personalInfo: info);

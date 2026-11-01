@@ -14,12 +14,12 @@ To provide the functionality of a professional resume builder, the app accesses 
 **All information you enter into the app is stored locally on your device.** 
 *   We do **NOT** collect, transmit, or store your personal data on external servers. 
 *   The application operates entirely offline once installed.
+*   Your CV (including your profile photo, if you add one) is saved automatically in the app's private storage so you can continue where you left off. It is deleted when you tap "Start a new CV" or uninstall the app.
 
 ## 3. Use of Permissions
 The app requests specific permissions only when triggered by user actions (Just-in-Time):
 *   **Camera Permission**: Used solely to allow you to take a profile photo within the app.
 *   **Photo Library / Media Permission**: Used solely to allow you to select an existing photo from your device.
-*   **Storage (Android 12 and below)**: Used to save the generated PDF and access photos on older Android versions. Newer versions use Scoped Storage or specific media permissions.
 
 ## 4. Privacy Policy for PDF Generation
 When you generate a PDF, the app creates the file and prompts you to select a save location using the system file picker. We do not have access to your other files or folders except the one you specifically choose to save your PDF into.
@@ -37,4 +37,4 @@ Our app does not knowingly collect any personal information from children under 
 We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy within the app or on its store listing.
 
 ## 9. Contact Us
-If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact us at: [Your Contact Email/Website]
+If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact us at: asimsafeer75@gmail.com

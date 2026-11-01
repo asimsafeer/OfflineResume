@@ -6,13 +6,58 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:in_app_review/in_app_review.dart';
 import '../providers/resume_provider.dart';
 import '../services/pdf_service.dart';
+import '../services/storage_service.dart';
 import 'resume_form.dart';
 import 'resume_preview.dart';
 
 class MainLayout extends ConsumerWidget {
   const MainLayout({super.key});
+
+  /// Asks for a Play Store rating once, after the 2nd successful export.
+  static Future<void> _askForReviewIfDue() async {
+    try {
+      if (!await StorageService.recordExportAndShouldAskReview()) return;
+      final review = InAppReview.instance;
+      if (await review.isAvailable()) {
+        await review.requestReview();
+      }
+    } catch (e) {
+      debugPrint('Review prompt failed: $e');
+    }
+  }
+
+  Future<void> _confirmClear(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Start a new CV?'),
+        content: const Text(
+          'This deletes everything you have entered so far. '
+          'Download your current CV first if you want to keep it.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete and start new'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await ref.read(resumeProvider.notifier).clear();
+    if (!context.mounted) return;
+    // Rebuild the screen so the form fields pick up the empty CV.
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const MainLayout()));
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,6 +71,11 @@ class MainLayout extends ConsumerWidget {
           style: GoogleFonts.inter(fontWeight: FontWeight.bold),
         ),
         actions: [
+          IconButton(
+            tooltip: 'Start a new CV',
+            icon: const Icon(Icons.note_add_outlined),
+            onPressed: () => _confirmClear(context, ref),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: ElevatedButton.icon(
@@ -53,6 +103,7 @@ class MainLayout extends ConsumerWidget {
                     if (outputFile != null) {
                       final file = File(outputFile);
                       await file.writeAsBytes(pdfBytes);
+                      await _askForReviewIfDue();
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('PDF Saved to: $outputFile')),
@@ -70,11 +121,15 @@ class MainLayout extends ConsumerWidget {
 
                     if (context.mounted) {
                       final box = context.findRenderObject() as RenderBox?;
-                      await Share.shareXFiles(
+                      final result = await Share.shareXFiles(
                         [XFile(file.path, mimeType: 'application/pdf')],
-                        sharePositionOrigin:
-                            box!.localToGlobal(Offset.zero) & box.size,
+                        sharePositionOrigin: box == null
+                            ? null
+                            : box.localToGlobal(Offset.zero) & box.size,
                       );
+                      if (result.status != ShareResultStatus.dismissed) {
+                        await _askForReviewIfDue();
+                      }
                     }
                   }
                 } catch (e) {

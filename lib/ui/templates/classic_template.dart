@@ -171,6 +171,34 @@ class ClassicTemplate extends StatelessWidget {
     );
   }
 
+  TextStyle _expStyle({
+    double delta = 0,
+    FontWeight? weight,
+    FontStyle? style,
+    Color? color,
+    double? height,
+  }) => GoogleFonts.getFont(
+    data.experienceFontFamily ?? 'Merriweather',
+    fontSize: data.experienceFontSize + delta,
+    fontWeight: weight,
+    fontStyle: style,
+    color: color,
+    height: height,
+  );
+
+  TextStyle _eduStyle({
+    double delta = 0,
+    FontWeight? weight,
+    FontStyle? style,
+    Color? color,
+  }) => GoogleFonts.getFont(
+    data.educationFontFamily ?? 'Merriweather',
+    fontSize: data.educationFontSize + delta,
+    fontWeight: weight,
+    fontStyle: style,
+    color: color,
+  );
+
   Widget _buildExperienceItem(Experience exp, Color themeColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -180,34 +208,20 @@ class ClassicTemplate extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                exp.company,
-                style: GoogleFonts.merriweather(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                  color: themeColor,
+              Flexible(
+                child: Text(
+                  exp.company,
+                  style: _expStyle(weight: FontWeight.bold, color: themeColor),
                 ),
               ),
-              Text(
-                '${exp.startDate} - ${exp.endDate}',
-                style: GoogleFonts.merriweather(fontSize: 12),
-              ),
+              Text('${exp.startDate} - ${exp.endDate}', style: _expStyle()),
             ],
           ),
-          Text(
-            exp.position,
-            style: GoogleFonts.merriweather(
-              fontStyle: FontStyle.italic,
-              fontSize: 12,
-            ),
-          ),
+          Text(exp.position, style: _expStyle(style: FontStyle.italic)),
           if (exp.description != null && exp.description!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Text(
-                exp.description!,
-                style: GoogleFonts.merriweather(fontSize: 12, height: 1.4),
-              ),
+              child: Text(exp.description!, style: _expStyle(height: 1.4)),
             ),
         ],
       ),
@@ -223,27 +237,21 @@ class ClassicTemplate extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                edu.institution,
-                style: GoogleFonts.merriweather(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                  color: themeColor,
+              Flexible(
+                child: Text(
+                  edu.institution,
+                  style: _eduStyle(weight: FontWeight.bold, color: themeColor),
                 ),
               ),
-              Text(
-                '${edu.startDate} - ${edu.endDate}',
-                style: GoogleFonts.merriweather(fontSize: 12),
-              ),
+              Text('${edu.startDate} - ${edu.endDate}', style: _eduStyle()),
             ],
           ),
-          Text(
-            edu.degree,
-            style: GoogleFonts.merriweather(
-              fontSize: 12,
-              fontStyle: FontStyle.italic,
+          Text(edu.degree, style: _eduStyle(style: FontStyle.italic)),
+          if (edu.description != null && edu.description!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(edu.description!, style: _eduStyle()),
             ),
-          ),
         ],
       ),
     );

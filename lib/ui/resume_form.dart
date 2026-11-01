@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../providers/resume_provider.dart';
 import '../models/resume_data.dart';
@@ -201,21 +203,11 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
         'We need access to your camera to take a profile picture for your resume.',
       );
     } else {
-      if (Platform.isAndroid) {
-        // Checking for different Android versions is handled by permission_handler
-        // but for photos specifically:
-        hasPermission = await _requestPermission(
-          Permission.photos,
-          'Gallery Access',
-          'We need access to your gallery to select a profile picture for your resume.',
-        );
-      } else {
-        hasPermission = await _requestPermission(
-          Permission.photos,
-          'Photos Access',
-          'We need access to your photos to select a profile picture for your resume.',
-        );
-      }
+      // The system photo picker (Android 13+, iOS 14+) and the document
+      // picker on older Android need no permission. Asking for
+      // Permission.photos here failed silently, because the app doesn't
+      // declare READ_MEDIA_IMAGES.
+      hasPermission = true;
     }
 
     if (!hasPermission) {
@@ -231,12 +223,39 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
 
     final XFile? image = await picker.pickImage(source: source);
 
-    if (image != null) {
-      final currentInfo = ref.read(resumeProvider).personalInfo;
-      ref
-          .read(resumeProvider.notifier)
-          .updatePersonalInfo(currentInfo.copyWith(profilePicture: image.path));
+    if (image == null) return;
+
+    // image_picker returns a cache file the OS may delete, so keep our own copy.
+    String savedPath = image.path;
+    final oldPath = ref.read(resumeProvider).personalInfo.profilePicture;
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final ext = p.extension(image.path).isEmpty
+          ? '.jpg'
+          : p.extension(image.path);
+      final copy = await File(image.path).copy(
+        p.join(
+          dir.path,
+          'profile_${DateTime.now().millisecondsSinceEpoch}$ext',
+        ),
+      );
+      savedPath = copy.path;
+      if (oldPath != null &&
+          oldPath.isNotEmpty &&
+          oldPath != savedPath &&
+          p.isWithin(dir.path, oldPath)) {
+        final oldFile = File(oldPath);
+        if (await oldFile.exists()) await oldFile.delete();
+      }
+    } catch (e) {
+      debugPrint('Could not copy profile photo: $e');
     }
+
+    if (!mounted) return;
+    final currentInfo = ref.read(resumeProvider).personalInfo;
+    ref
+        .read(resumeProvider.notifier)
+        .updatePersonalInfo(currentInfo.copyWith(profilePicture: savedPath));
   }
 
   @override
@@ -333,7 +352,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                           ),
                         ),
                         isExpanded: true,
-                        items: TemplateId.values.map((id) {
+                        items: availableTemplates.map((id) {
                           return DropdownMenuItem(
                             value: id,
                             child: Text(
@@ -449,9 +468,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
                       borderRadius: BorderRadius.circular(12),
-                      image:
-                          data.personalInfo.profilePicture != null &&
-                              data.personalInfo.profilePicture!.isNotEmpty
+                      image: data.personalInfo.hasPhoto
                           ? DecorationImage(
                               image:
                                   data.personalInfo.profilePicture!.startsWith(
@@ -470,9 +487,7 @@ class _ResumeFormState extends ConsumerState<ResumeForm> {
                             )
                           : null,
                     ),
-                    child:
-                        data.personalInfo.profilePicture == null ||
-                            data.personalInfo.profilePicture!.isEmpty
+                    child: !data.personalInfo.hasPhoto
                         ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

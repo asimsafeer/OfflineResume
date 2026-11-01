@@ -50,8 +50,7 @@ class ModernTemplate extends StatelessWidget {
               ),
             ),
             // Photo placeholder (Simplified)
-            if (data.personalInfo.profilePicture != null &&
-                data.personalInfo.profilePicture!.isNotEmpty)
+            if (data.personalInfo.hasPhoto)
               Container(
                 width: 80,
                 height: 80,
@@ -148,6 +147,35 @@ class ModernTemplate extends StatelessWidget {
                 .map((skill) => _buildSkillChip(skill, themeColor))
                 .toList(),
           ),
+          const SizedBox(height: 24),
+        ],
+        // Languages
+        if (data.languages.isNotEmpty) ...[
+          _buildSectionTitle('LANGUAGES', themeColor),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: data.languages
+                .map(
+                  (l) => _buildSkillChip(
+                    l.proficiency.isEmpty
+                        ? l.name
+                        : '${l.name} · ${l.proficiency}',
+                    themeColor,
+                  ),
+                )
+                .toList(),
+          ),
+          const SizedBox(height: 24),
+        ],
+        // Certificates
+        if (data.certificates.isNotEmpty) ...[
+          _buildSectionTitle('CERTIFICATIONS', themeColor),
+          const SizedBox(height: 12),
+          ...data.certificates.map(
+            (cert) => _buildCertificateItem(cert, themeColor),
+          ),
         ],
       ],
     );
@@ -191,6 +219,27 @@ class ModernTemplate extends StatelessWidget {
     );
   }
 
+  TextStyle _expStyle({
+    double delta = 0,
+    FontWeight? weight,
+    Color? color,
+    double? height,
+  }) => GoogleFonts.getFont(
+    data.experienceFontFamily ?? 'Inter',
+    fontSize: data.experienceFontSize + delta,
+    fontWeight: weight,
+    color: color,
+    height: height,
+  );
+
+  TextStyle _eduStyle({double delta = 0, FontWeight? weight, Color? color}) =>
+      GoogleFonts.getFont(
+        data.educationFontFamily ?? 'Inter',
+        fontSize: data.educationFontSize + delta,
+        fontWeight: weight,
+        color: color,
+      );
+
   Widget _buildExperienceItem(Experience exp, Color themeColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -200,33 +249,28 @@ class ModernTemplate extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                exp.position,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
+              Flexible(
+                child: Text(
+                  exp.position,
+                  style: _expStyle(delta: 1, weight: FontWeight.bold),
                 ),
               ),
               Text(
                 '${exp.startDate} - ${exp.endDate}',
-                style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                style: _expStyle(delta: -1, color: Colors.grey[600]),
               ),
             ],
           ),
           Text(
             exp.company,
-            style: TextStyle(
-              color: themeColor,
-              fontWeight: FontWeight.w500,
-              fontSize: 12,
-            ),
+            style: _expStyle(weight: FontWeight.w500, color: themeColor),
           ),
           if (exp.description != null && exp.description!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
                 exp.description!,
-                style: const TextStyle(fontSize: 11, height: 1.4),
+                style: _expStyle(delta: -1, height: 1.4),
               ),
             ),
         ],
@@ -243,20 +287,56 @@ class ModernTemplate extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                edu.institution,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
+              Flexible(
+                child: Text(
+                  edu.institution,
+                  style: _eduStyle(delta: 1, weight: FontWeight.bold),
                 ),
               ),
               Text(
                 '${edu.startDate} - ${edu.endDate}',
-                style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                style: _eduStyle(delta: -1, color: Colors.grey[600]),
               ),
             ],
           ),
-          Text(edu.degree, style: TextStyle(color: themeColor, fontSize: 12)),
+          Text(edu.degree, style: _eduStyle(color: themeColor)),
+          if (edu.description != null && edu.description!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(edu.description!, style: _eduStyle(delta: -1)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCertificateItem(Certificate cert, Color themeColor) {
+    final meta = [
+      cert.issuer,
+      cert.date,
+    ].where((s) => s.isNotEmpty).join(' · ');
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            cert.name,
+            style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+          if (meta.isNotEmpty)
+            Text(
+              meta,
+              style: GoogleFonts.inter(fontSize: 11, color: themeColor),
+            ),
+          if (cert.description != null && cert.description!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                cert.description!,
+                style: GoogleFonts.inter(fontSize: 11, height: 1.4),
+              ),
+            ),
         ],
       ),
     );
@@ -271,7 +351,7 @@ class ModernTemplate extends StatelessWidget {
       ),
       child: Text(
         skill,
-        style: TextStyle(
+        style: GoogleFonts.inter(
           color: themeColor,
           fontSize: 11,
           fontWeight: FontWeight.w500,
