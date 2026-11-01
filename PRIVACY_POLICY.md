@@ -19,7 +19,7 @@ To provide the functionality of a professional resume builder, the app accesses 
 ## 3. Use of Permissions
 The app requests specific permissions only when triggered by user actions (Just-in-Time):
 *   **Camera Permission**: Used solely to allow you to take a profile photo within the app.
-*   **Photo Library / Media Permission**: Used solely to allow you to select an existing photo from your device.
+*   **Photos**: When you choose a photo from your gallery, the app uses the system photo picker, which only shares the one photo you select. No photo library permission is requested.
 
 ## 4. Privacy Policy for PDF Generation
 When you generate a PDF, the app creates the file and prompts you to select a save location using the system file picker. We do not have access to your other files or folders except the one you specifically choose to save your PDF into.
